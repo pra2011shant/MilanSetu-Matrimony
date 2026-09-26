@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { InterestService, InterestItem, InterestCounts } from '../../services/interest.service';
+import { AlertService } from '../../services/alert.service';
 
 type InterestTab = 'received' | 'sent' | 'connected';
 
@@ -15,7 +16,7 @@ type InterestTab = 'received' | 'sent' | 'connected';
 })
 export class InterestsComponent implements OnInit {
   activeTab: InterestTab = 'received';
-  subFilter: string = 'All'; // All, Pending, Accepted, Declined
+  subFilter: string = 'All';
   isLoading = true;
   counts: InterestCounts = { pendingReceived: 0, acceptedConnected: 0, pendingSent: 0, totalReceived: 0 };
   
@@ -25,14 +26,16 @@ export class InterestsComponent implements OnInit {
 
   selectedItemForModal: InterestItem | null = null;
   selectedContactForModal: InterestItem | null = null;
-  toastMessage: string | null = null;
 
   // Custom Send Interest Modal State
   isSendModalOpen = false;
   targetProfileForInterest: any = null;
   customNote = "Hi! I saw your profile on MilanSetu and found our values and life goals very compatible. I'd love to connect!";
 
-  constructor(private interestService: InterestService) {}
+  constructor(
+    private interestService: InterestService,
+    private alertService: AlertService
+  ) {}
 
   ngOnInit(): void {
     this.loadCounts();
@@ -96,8 +99,14 @@ export class InterestsComponent implements OnInit {
     this.loadData();
   }
 
-  respondToInterest(item: InterestItem, action: 'Accepted' | 'Declined', event: Event): void {
+  async respondToInterest(item: InterestItem, action: 'Accepted' | 'Declined', event: Event): Promise<void> {
     event.stopPropagation();
+
+    if (action === 'Declined') {
+      const result = await this.alertService.confirm('Decline Interest?', `Are you sure you want to decline the connection request from ${item.name}?`, 'Yes, Decline');
+      if (!result.isConfirmed) return;
+    }
+
     item.status = action;
     if (action === 'Accepted') {
       item.isCommunicationUnlocked = true;
@@ -107,28 +116,37 @@ export class InterestsComponent implements OnInit {
 
     this.interestService.respondToInterest(item.id, action).subscribe({
       next: (res) => {
-        this.showToast(res.message);
+        if (action === 'Accepted') {
+          this.alertService.success('Connection Accepted! 🎉', `You and ${item.name} are now connected. Communication and contact details are unlocked!`);
+        } else {
+          this.alertService.toastInfo(res.message, 'Interest Response');
+        }
         this.loadCounts();
       },
       error: () => {
-        this.showToast(action === 'Accepted' 
-          ? `🎉 Accepted interest from ${item.name}! Communication unlocked.` 
-          : `Interest declined.`);
+        if (action === 'Accepted') {
+          this.alertService.success('Connection Accepted! 🎉', `You and ${item.name} are now connected. Communication and contact details are unlocked!`);
+        } else {
+          this.alertService.toastInfo(`Interest declined.`, 'Interest Response');
+        }
         this.loadCounts();
       }
     });
   }
 
-  withdrawSentInterest(item: InterestItem, event: Event): void {
+  async withdrawSentInterest(item: InterestItem, event: Event): Promise<void> {
     event.stopPropagation();
+    const result = await this.alertService.confirm('Withdraw Interest?', `Do you want to cancel the interest sent to ${item.name}?`, 'Yes, Withdraw');
+    if (!result.isConfirmed) return;
+
     item.status = 'Withdrawn';
     this.interestService.withdrawInterest(item.id).subscribe({
       next: (res) => {
-        this.showToast(res.message);
+        this.alertService.toastInfo(res.message, 'Interest Withdrawn');
         this.loadCounts();
       },
       error: () => {
-        this.showToast(`Interest to ${item.name} withdrawn.`);
+        this.alertService.toastInfo(`Interest to ${item.name} withdrawn.`, 'Interest Withdrawn');
         this.loadCounts();
       }
     });
@@ -149,12 +167,5 @@ export class InterestsComponent implements OnInit {
 
   closeProfileModal(): void {
     this.selectedItemForModal = null;
-  }
-
-  showToast(msg: string): void {
-    this.toastMessage = msg;
-    setTimeout(() => {
-      this.toastMessage = null;
-    }, 4000);
   }
 }

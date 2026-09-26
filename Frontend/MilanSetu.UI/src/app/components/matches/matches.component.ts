@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatchesService, MatchedProfile, DashboardMatchesResponse } from '../../services/matches.service';
+import { AlertService } from '../../services/alert.service';
 
 type MatchTab = 'recommended' | 'new' | 'nearMe' | 'shortlisted' | 'visitors' | 'recent';
 
@@ -21,7 +22,10 @@ export class MatchesComponent implements OnInit {
   selectedScoreProfile: MatchedProfile | null = null;
   toastMessage: string | null = null;
 
-  constructor(private matchesService: MatchesService) {}
+  constructor(
+    private matchesService: MatchesService,
+    private alertService: AlertService
+  ) {}
 
   ngOnInit(): void {
     this.loadMatches();
@@ -73,7 +77,7 @@ export class MatchesComponent implements OnInit {
     this.matchesService.toggleShortlist(profile.id).subscribe({
       next: (res) => {
         profile.isShortlisted = res.isShortlisted;
-        this.showToast(res.message);
+        this.alertService.toastInfo(res.message, 'Shortlist');
         if (this.dashboardData) {
           if (res.isShortlisted) {
             if (!this.dashboardData.shortlistedMatches.some(p => p.id === profile.id)) {
@@ -86,7 +90,7 @@ export class MatchesComponent implements OnInit {
         }
       },
       error: () => {
-        this.showToast(profile.isShortlisted ? `⭐ Added ${profile.name} to Shortlist` : `Removed from Shortlist`);
+        this.alertService.toastInfo(profile.isShortlisted ? `Added ${profile.name} to Shortlist` : `Removed from Shortlist`, 'Shortlist');
       }
     });
   }
@@ -99,10 +103,10 @@ export class MatchesComponent implements OnInit {
     this.matchesService.sendInterest(profile.id).subscribe({
       next: (res) => {
         profile.interestStatus = res.status;
-        this.showToast(res.message);
+        this.alertService.toastSuccess(res.message, 'Express Interest');
       },
       error: () => {
-        this.showToast(willSend ? `✨ Express Interest sent to ${profile.name}!` : `Interest withdrawn.`);
+        this.alertService.toastSuccess(willSend ? `Express Interest sent to ${profile.name}!` : `Interest withdrawn.`, 'Express Interest');
       }
     });
   }

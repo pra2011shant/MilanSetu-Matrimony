@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatchesService, MatchedProfile } from '../../services/matches.service';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-shortlist',
@@ -15,10 +16,12 @@ export class ShortlistComponent implements OnInit {
   isLoading = true;
   shortlistedProfiles: MatchedProfile[] = [];
   selectedProfileForModal: MatchedProfile | null = null;
-  toastMessage: string | null = null;
   searchFilter = '';
 
-  constructor(private matchesService: MatchesService) {}
+  constructor(
+    private matchesService: MatchesService,
+    private alertService: AlertService
+  ) {}
 
   ngOnInit(): void {
     this.loadShortlist();
@@ -31,7 +34,6 @@ export class ShortlistComponent implements OnInit {
         this.isLoading = false;
         this.shortlistedProfiles = data.shortlistedMatches || [];
         if (this.shortlistedProfiles.length === 0 && data.recommendedMatches.length > 0) {
-          // ensure initial items are visible
           this.shortlistedProfiles = [data.recommendedMatches[0], data.recommendedMatches[1]];
         }
       },
@@ -56,11 +58,11 @@ export class ShortlistComponent implements OnInit {
     this.matchesService.toggleShortlist(profile.id).subscribe({
       next: () => {
         this.shortlistedProfiles = this.shortlistedProfiles.filter(p => p.id !== profile.id);
-        this.showToast(`Removed ${profile.name} from your shortlist.`);
+        this.alertService.toastInfo(`Removed ${profile.name} from your shortlist.`, 'Shortlist Updated');
       },
       error: () => {
         this.shortlistedProfiles = this.shortlistedProfiles.filter(p => p.id !== profile.id);
-        this.showToast(`Removed from shortlist.`);
+        this.alertService.toastInfo(`Removed from shortlist.`, 'Shortlist Updated');
       }
     });
   }
@@ -70,10 +72,10 @@ export class ShortlistComponent implements OnInit {
     profile.interestStatus = profile.interestStatus === 'Pending' ? 'None' : 'Pending';
     this.matchesService.sendInterest(profile.id).subscribe({
       next: (res) => {
-        this.showToast(res.message);
+        this.alertService.toastSuccess(res.message, 'Express Interest');
       },
       error: () => {
-        this.showToast(`✨ Sent Express Interest to ${profile.name}!`);
+        this.alertService.toastSuccess(`Sent Express Interest to ${profile.name}!`, 'Express Interest');
       }
     });
   }
@@ -84,12 +86,5 @@ export class ShortlistComponent implements OnInit {
 
   closeProfile(): void {
     this.selectedProfileForModal = null;
-  }
-
-  showToast(msg: string): void {
-    this.toastMessage = msg;
-    setTimeout(() => {
-      this.toastMessage = null;
-    }, 3500);
   }
 }

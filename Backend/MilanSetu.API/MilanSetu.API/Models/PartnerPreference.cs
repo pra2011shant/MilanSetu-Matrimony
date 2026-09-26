@@ -4,12 +4,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MilanSetu.API.Models
 {
+    /// <summary>
+    /// Database Table Mapping: [dbo].[PartnerPreferences]
+    /// 11 Partner Search Criteria used by the Matchmaking Algorithm to calculate Match Scores.
+    /// </summary>
+    [Table("PartnerPreferences")]
     public class PartnerPreference
     {
+        /// <summary>
+        /// Column: Id (INT, Primary Key, Identity)
+        /// </summary>
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
+        /// <summary>
+        /// Column: UserId (INT, Foreign Key -> [dbo].[Users].[Id])
+        /// </summary>
         public int UserId { get; set; }
         [ForeignKey("UserId")]
         public User User { get; set; } = null!;

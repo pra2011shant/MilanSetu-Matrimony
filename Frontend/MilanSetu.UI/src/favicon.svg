@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e" />
+      <stop offset="100%" stop-color="#be123c" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#e11d48" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <circle cx="16" cy="16" r="15" fill="#fff1f2" stroke="#e11d48" stroke-width="1.5" />
+  <path d="M16 23.5l-1.45-1.32C9.4 17.6 6 14.52 6 10.75 6 7.67 8.42 5.25 11.5 5.25c1.74 0 3.41.81 4.5 2.09 1.09-1.28 2.76-2.09 4.5-2.09 3.08 0 5.5 2.42 5.5 5.5 0 3.77-3.4 6.85-8.55 11.43L16 23.5z" fill="url(#heartGrad)" filter="url(#glow)"/>
+</svg>
