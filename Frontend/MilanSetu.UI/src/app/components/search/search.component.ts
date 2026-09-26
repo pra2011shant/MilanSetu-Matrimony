@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { SearchService, SearchFilter, SearchResultItem } from '../../services/search.service';
+import { MatchesService } from '../../services/matches.service';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-search',
@@ -119,7 +121,12 @@ export class SearchComponent implements OnInit {
     'Chennai', 'Kolkata', 'Ahmedabad', 'Jaipur', 'Chandigarh'
   ];
 
-  constructor(private searchService: SearchService, private route: ActivatedRoute) {}
+  constructor(
+    private searchService: SearchService,
+    private matchesService: MatchesService,
+    private alertService: AlertService,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
     // Read query params from URL if navigated from home page quick search
@@ -138,6 +145,9 @@ export class SearchComponent implements OnInit {
       }
       if (params['motherTongue']) {
         this.filter.motherTongue = params['motherTongue'];
+      }
+      if (params['profileId']) {
+        this.filter.profileId = params['profileId'];
       }
       this.executeSearch();
     });
@@ -199,16 +209,16 @@ export class SearchComponent implements OnInit {
       sortBy: 'relevance'
     };
     this.executeSearch();
-    this.showToast('Filters reset to default.');
+    this.alertService.toastInfo('Filters reset to default.', 'Search Filters');
   }
 
   sendInterest(profile: SearchResultItem, event: Event): void {
     event.stopPropagation();
     profile.interestSent = !profile.interestSent;
     if (profile.interestSent) {
-      this.showToast(`✨ Sent Interest to ${profile.name}! They will be notified.`);
+      this.alertService.toastSuccess(`Sent Interest to ${profile.name}! They will be notified.`, 'Express Interest');
     } else {
-      this.showToast(`Interest in ${profile.name} withdrawn.`);
+      this.alertService.toastInfo(`Interest in ${profile.name} withdrawn.`, 'Express Interest');
     }
   }
 
@@ -216,14 +226,19 @@ export class SearchComponent implements OnInit {
     event.stopPropagation();
     profile.isShortlisted = !profile.isShortlisted;
     if (profile.isShortlisted) {
-      this.showToast(`⭐ Added ${profile.name} to your Shortlist!`);
+      this.alertService.toastInfo(`Added ${profile.name} to your Shortlist!`, 'Shortlist');
     } else {
-      this.showToast(`Removed from Shortlist.`);
+      this.alertService.toastInfo(`Removed from Shortlist.`, 'Shortlist');
     }
   }
 
   openDetailModal(profile: SearchResultItem): void {
     this.selectedProfile = profile;
+    // Record view & trigger notification to the target user with Matrimony ID
+    this.matchesService.recordView(profile.id).subscribe({
+      next: () => {},
+      error: () => {}
+    });
   }
 
   closeDetailModal(): void {

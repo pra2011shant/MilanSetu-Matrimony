@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { NotificationService, AppNotification } from '../../services/notification.service';
 import { TranslationService, LanguageOption } from '../../services/translation.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-navbar',
@@ -23,7 +24,8 @@ export class NavbarComponent implements OnInit {
   constructor(
     public authService: AuthService,
     public notifService: NotificationService,
-    public transService: TranslationService
+    public transService: TranslationService,
+    private alertService: AlertService
   ) {}
 
   ngOnInit(): void {
@@ -70,6 +72,7 @@ export class NavbarComponent implements OnInit {
 
   logout() {
     this.authService.logout();
+    this.alertService.toastInfo('You have logged out of your account.', 'Logged Out');
   }
 }
 

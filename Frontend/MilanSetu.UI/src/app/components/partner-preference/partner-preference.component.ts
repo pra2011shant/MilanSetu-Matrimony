@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { PartnerPreferenceService, PartnerPreference } from '../../services/partner-preference.service';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-partner-preference',
@@ -29,6 +30,12 @@ export class PartnerPreferenceComponent implements OnInit {
     drink: 'Non-Drinker / Social Drinker',
     smoke: 'Non-Smoker'
   };
+
+  constructor(
+    private prefService: PartnerPreferenceService,
+    private router: Router,
+    private alertService: AlertService
+  ) {}
 
   ageOptions: number[] = Array.from({ length: 43 }, (_, i) => 18 + i); // 18 to 60
   
@@ -141,8 +148,6 @@ export class PartnerPreferenceComponent implements OnInit {
   toastMessage: string | null = null;
   estimatedMatches = 1420;
 
-  constructor(private prefService: PartnerPreferenceService, private router: Router) {}
-
   ngOnInit(): void {
     this.loadPreferences();
   }
@@ -171,11 +176,11 @@ export class PartnerPreferenceComponent implements OnInit {
     this.prefService.savePreferences(this.preference).subscribe({
       next: (res) => {
         this.isSaving = false;
-        this.showToast('✨ Partner preferences successfully saved to database!');
+        this.alertService.toastSuccess('Partner preferences successfully saved to database!', 'Preferences Saved');
       },
       error: () => {
         this.isSaving = false;
-        this.showToast('✨ Partner preferences saved locally!');
+        this.alertService.toastSuccess('Partner preferences saved locally!', 'Preferences Saved');
       }
     });
   }
@@ -195,26 +200,19 @@ export class PartnerPreferenceComponent implements OnInit {
       this.preference.education = 'Engineering / B.Tech / M.Tech';
       this.preference.maritalStatus = 'Any Marital Status';
       this.preference.drink = 'Non-Drinker / Social Drinker';
-      this.showToast('🎯 Applied "Modern & Broadminded" preset!');
+      this.alertService.toastInfo('Applied "Modern & Broadminded" preset!', 'Preset Applied');
     } else if (type === 'traditional') {
       this.preference.maritalStatus = 'Never Married';
       this.preference.diet = 'Vegetarian Only';
       this.preference.drink = 'Strictly Non-Drinker';
       this.preference.smoke = 'Strictly Non-Smoker';
-      this.showToast('🕊️ Applied "Traditional & Cultured" preset!');
+      this.alertService.toastInfo('Applied "Traditional & Cultured" preset!', 'Preset Applied');
     } else if (type === 'high_income') {
       this.preference.minAnnualIncome = '₹25 Lakhs & Above';
       this.preference.education = 'Management / MBA / PGDM';
       this.preference.profession = 'Software / Tech / IT Professional';
-      this.showToast('💼 Applied "High Net-Worth & Elite" preset!');
+      this.alertService.toastInfo('Applied "High Net-Worth & Elite" preset!', 'Preset Applied');
     }
     this.calculateEstimatedMatches();
-  }
-
-  showToast(msg: string): void {
-    this.toastMessage = msg;
-    setTimeout(() => {
-      this.toastMessage = null;
-    }, 3500);
   }
 }

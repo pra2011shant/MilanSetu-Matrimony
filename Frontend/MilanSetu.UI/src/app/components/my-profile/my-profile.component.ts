@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ProfileService, UserProfile } from '../../services/profile.service';
 import { AuthService } from '../../services/auth.service';
+import { AlertService } from '../../services/alert.service';
 
 @Component({
   selector: 'app-my-profile',
@@ -18,8 +19,13 @@ export class MyProfileComponent implements OnInit {
   isPreviewMode: boolean = false;
   isLoading: boolean = false;
   isSaving: boolean = false;
-  toastMessage: string | null = null;
   newPhotoUrl: string = '';
+
+  constructor(
+    private profileService: ProfileService,
+    private authService: AuthService,
+    private alertService: AlertService
+  ) {}
 
   // Default Mock Profile Data
   profile: UserProfile = {
@@ -135,8 +141,6 @@ export class MyProfileComponent implements OnInit {
     '₹1 Crore & Above'
   ];
 
-  constructor(private profileService: ProfileService, private authService: AuthService) {}
-
   ngOnInit(): void {
     this.loadProfile();
   }
@@ -177,12 +181,12 @@ export class MyProfileComponent implements OnInit {
         if (res && res.profile) {
           this.profile = { ...this.profile, ...res.profile };
         }
-        this.showToast('✨ Section updated successfully!');
+        this.alertService.toastSuccess('Profile section updated successfully!', 'Profile Saved');
       },
       error: () => {
         this.isSaving = false;
         this.editState[section] = false;
-        this.showToast('✨ Section saved locally!');
+        this.alertService.toastSuccess('Profile section saved locally!', 'Profile Saved');
       }
     });
   }
@@ -190,20 +194,20 @@ export class MyProfileComponent implements OnInit {
   setPrimaryPhoto(photoUrl: string): void {
     this.profile.profilePhotoUrl = photoUrl;
     this.profileService.updateProfile(this.profile).subscribe();
-    this.showToast('🌟 Set as primary profile photo!');
+    this.alertService.toastSuccess('Set as primary profile photo!', 'Photo Updated');
   }
 
   addPhoto(url: string): void {
     if (!url || !url.trim()) return;
     if (!this.profile.photoGallery) this.profile.photoGallery = [];
     if (this.profile.photoGallery.length >= 6) {
-      this.showToast('You can upload a maximum of 6 photos.');
+      this.alertService.toastError('You can upload a maximum of 6 photos.', 'Photo Limit');
       return;
     }
     this.profile.photoGallery.push(url.trim());
     this.newPhotoUrl = '';
     this.profileService.updateProfile(this.profile).subscribe();
-    this.showToast('📷 New photo added to gallery!');
+    this.alertService.toastSuccess('New photo added to gallery!', 'Photo Added');
   }
 
   removePhoto(photoUrl: string): void {
@@ -212,13 +216,6 @@ export class MyProfileComponent implements OnInit {
       this.profile.profilePhotoUrl = this.profile.photoGallery[0];
     }
     this.profileService.updateProfile(this.profile).subscribe();
-    this.showToast('Photo removed.');
-  }
-
-  showToast(msg: string): void {
-    this.toastMessage = msg;
-    setTimeout(() => {
-      this.toastMessage = null;
-    }, 3500);
+    this.alertService.toastInfo('Photo removed from gallery.', 'Photo Removed');
   }
 }

@@ -23,7 +23,9 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'login', component: LoginComponent },
   { path: 'my-profile', component: MyProfileComponent },
+  { path: 'profile', redirectTo: 'my-profile', pathMatch: 'full' },
   { path: 'partner-preference', component: PartnerPreferenceComponent },
+  { path: 'preference', redirectTo: 'partner-preference', pathMatch: 'full' },
   { path: '**', redirectTo: '' }
 ];
 

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { AlertService } from '../../services/alert.service';
 
 export interface Profile {
   id: string;
@@ -86,6 +87,8 @@ export class HomeComponent {
   // Selected Profile for Modal
   selectedProfile: Profile | null = null;
   toastMessage: string | null = null;
+
+  constructor(private alertService: AlertService) {}
 
   // Profiles Database (Mock Data with rich aesthetics)
   allProfiles: Profile[] = [
@@ -253,7 +256,7 @@ export class HomeComponent {
       element.scrollIntoView({ behavior: 'smooth' });
     }
 
-    this.showToast(`Found ${this.filteredProfiles.length} compatible profile(s) matching your criteria!`);
+    this.alertService.toastSuccess(`Found ${this.filteredProfiles.length} compatible profile(s)!`, 'Search Results');
   }
 
   applyTabFilter(tab: 'all' | 'brides' | 'grooms' | 'premium') {
@@ -273,9 +276,9 @@ export class HomeComponent {
     event.stopPropagation();
     profile.interestSent = !profile.interestSent;
     if (profile.interestSent) {
-      this.showToast(`✨ Expressed Interest in ${profile.name}! Notification sent.`);
+      this.alertService.toastSuccess(`Expressed Interest in ${profile.name}! Notification sent.`, 'Express Interest');
     } else {
-      this.showToast(`Interest in ${profile.name} withdrawn.`);
+      this.alertService.toastInfo(`Interest in ${profile.name} withdrawn.`, 'Express Interest');
     }
   }
 
