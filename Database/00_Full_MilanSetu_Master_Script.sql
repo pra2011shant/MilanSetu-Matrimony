@@ -342,14 +342,14 @@ END
 -- SEED MASTER DATA
 IF NOT EXISTS (SELECT 1 FROM dbo.MasterReligions)
 BEGIN
-    INSERT INTO dbo.MasterReligions (Name, DisplayOrder, IsActive) VALUES 
+    INSERT INTO dbo.MasterReligions (Name, SortOrder, IsActive) VALUES 
     (N'Hindu', 1, 1), (N'Muslim', 2, 1), (N'Sikh', 3, 1), (N'Christian', 4, 1), 
     (N'Jain', 5, 1), (N'Buddhist', 6, 1), (N'Parsi', 7, 1), (N'Jewish', 8, 1), (N'Other', 9, 1);
 END
 
 IF NOT EXISTS (SELECT 1 FROM dbo.MasterMotherTongues)
 BEGIN
-    INSERT INTO dbo.MasterMotherTongues (Name, DisplayOrder, IsActive) VALUES 
+    INSERT INTO dbo.MasterMotherTongues (Name, SortOrder, IsActive) VALUES 
     (N'Hindi', 1, 1), (N'Bengali', 2, 1), (N'Marathi', 3, 1), (N'Telugu', 4, 1), 
     (N'Tamil', 5, 1), (N'Gujarati', 6, 1), (N'Urdu', 7, 1), (N'Kannada', 8, 1), 
     (N'Odia', 9, 1), (N'Malayalam', 10, 1), (N'Punjabi', 11, 1), (N'Assamese', 12, 1), 
@@ -358,7 +358,7 @@ END
 
 IF NOT EXISTS (SELECT 1 FROM dbo.MasterEducations)
 BEGIN
-    INSERT INTO dbo.MasterEducations (Name, DisplayOrder, IsActive) VALUES 
+    INSERT INTO dbo.MasterEducations (DegreeName, SortOrder, IsActive) VALUES 
     (N'B.Tech / B.E / B.S', 1, 1), (N'M.Tech / M.E / M.S', 2, 1), (N'MBA / PGDM', 3, 1), 
     (N'BCA / MCA / B.Sc IT', 4, 1), (N'MBBS / MD / MS / BDS', 5, 1), (N'CA / CS / ICWA / CFA', 6, 1), 
     (N'B.Com / M.Com', 7, 1), (N'B.A / M.A', 8, 1), (N'LLB / LLM', 9, 1), 
@@ -367,7 +367,7 @@ END
 
 IF NOT EXISTS (SELECT 1 FROM dbo.MasterOccupations)
 BEGIN
-    INSERT INTO dbo.MasterOccupations (Name, DisplayOrder, IsActive) VALUES 
+    INSERT INTO dbo.MasterOccupations (Title, SortOrder, IsActive) VALUES 
     (N'Software Engineer / Architect', 1, 1), (N'Data Scientist / AI Specialist', 2, 1), 
     (N'Doctor / Surgeon / Healthcare', 3, 1), (N'Chartered Accountant / Finance', 4, 1), 
     (N'Civil Services / IAS / IPS / Govt', 5, 1), (N'Business Owner / Entrepreneur', 6, 1), 
@@ -378,7 +378,7 @@ END
 
 IF NOT EXISTS (SELECT 1 FROM dbo.MasterIncomeRanges)
 BEGIN
-    INSERT INTO dbo.MasterIncomeRanges (RangeText, DisplayOrder, IsActive) VALUES 
+    INSERT INTO dbo.MasterIncomeRanges (RangeText, SortOrder, IsActive) VALUES 
     (N'₹3 - ₹5 Lakhs', 1, 1), (N'₹5 - ₹7 Lakhs', 2, 1), (N'₹7 - ₹10 Lakhs', 3, 1), 
     (N'₹10 - ₹15 Lakhs', 4, 1), (N'₹15 - ₹25 Lakhs', 5, 1), (N'₹25 - ₹50 Lakhs', 6, 1), 
     (N'₹50 Lakhs - ₹1 Crore', 7, 1), (N'₹1 Crore & Above', 8, 1);
@@ -386,13 +386,13 @@ END
 
 IF NOT EXISTS (SELECT 1 FROM dbo.MasterLocations)
 BEGIN
-    INSERT INTO dbo.MasterLocations (CityName, StateName, DisplayOrder, IsActive) VALUES 
-    (N'Mumbai', N'Maharashtra', 1, 1), (N'Delhi NCR', N'Delhi', 2, 1), 
-    (N'Bengaluru', N'Karnataka', 3, 1), (N'Pune', N'Maharashtra', 4, 1), 
-    (N'Hyderabad', N'Telangana', 5, 1), (N'Chennai', N'Tamil Nadu', 6, 1), 
-    (N'Kolkata', N'West Bengal', 7, 1), (N'Ahmedabad', N'Gujarat', 8, 1), 
-    (N'Jaipur', N'Rajasthan', 9, 1), (N'Lucknow', N'Uttar Pradesh', 10, 1), 
-    (N'Chandigarh', N'Punjab', 11, 1), (N'Indore', N'Madhya Pradesh', 12, 1);
+    INSERT INTO dbo.MasterLocations (CityName, StateName, Country, IsPopular, SortOrder) VALUES 
+    (N'Mumbai', N'Maharashtra', N'India', 1, 1), (N'Delhi NCR', N'Delhi', N'India', 1, 2), 
+    (N'Bengaluru', N'Karnataka', N'India', 1, 3), (N'Pune', N'Maharashtra', N'India', 1, 4), 
+    (N'Hyderabad', N'Telangana', N'India', 1, 5), (N'Chennai', N'Tamil Nadu', N'India', 1, 6), 
+    (N'Kolkata', N'West Bengal', N'India', 1, 7), (N'Ahmedabad', N'Gujarat', N'India', 1, 8), 
+    (N'Jaipur', N'Rajasthan', N'India', 1, 9), (N'Lucknow', N'Uttar Pradesh', N'India', 1, 10), 
+    (N'Chandigarh', N'Punjab', N'India', 1, 11), (N'Indore', N'Madhya Pradesh', N'India', 1, 12);
 END
 
 PRINT '>>> All MilanSetu Tables, Master Data & Seed Data Initialized! <<<';
