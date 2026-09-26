@@ -1,0 +1,377 @@
+<div class="interests-page">
+  <!-- Top Banner -->
+  <section class="interests-hero">
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-text">
+          <span class="badge-gold"><i class="bi bi-heart-pulse-fill"></i> Sacred Connections & Invitations</span>
+          <h1>Express <span class="text-gold">Interest Inbox</span></h1>
+          <p>
+            Manage requests from prospective life partners. When you <strong>Accept</strong> an invitation, direct communication channels and contact details are automatically unlocked!
+          </p>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-pill">
+            <span class="stat-val">{{ counts.pendingReceived }}</span>
+            <span class="stat-lbl">Pending Received</span>
+          </div>
+          <div class="stat-pill stat-connected">
+            <span class="stat-val">{{ counts.acceptedConnected }}</span>
+            <span class="stat-lbl">Connected Matches</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-val">{{ counts.pendingSent }}</span>
+            <span class="stat-lbl">Awaiting Response</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Container -->
+  <div class="container main-content-wrap">
+    <!-- Primary Tab Bar -->
+    <div class="primary-tabs">
+      <button class="primary-tab-btn" [class.active]="activeTab === 'received'" (click)="setTab('received')">
+        <i class="bi bi-inbox-fill"></i>
+        <span>Interests Received</span>
+        <span class="tab-badge" *ngIf="counts.pendingReceived > 0">{{ counts.pendingReceived }}</span>
+      </button>
+
+      <button class="primary-tab-btn" [class.active]="activeTab === 'connected'" (click)="setTab('connected')">
+        <i class="bi bi-person-check-fill text-gold"></i>
+        <span>Connected Matches (Unlocked)</span>
+        <span class="tab-badge badge-green" *ngIf="counts.acceptedConnected > 0">{{ counts.acceptedConnected }}</span>
+      </button>
+
+      <button class="primary-tab-btn" [class.active]="activeTab === 'sent'" (click)="setTab('sent')">
+        <i class="bi bi-send-fill"></i>
+        <span>Interests Sent</span>
+      </button>
+    </div>
+
+    <!-- Sub Status Filter (For Received and Sent tabs) -->
+    <div class="sub-filter-bar" *ngIf="activeTab !== 'connected'">
+      <span class="filter-label"><i class="bi bi-funnel"></i> Status:</span>
+      <button class="sub-pill" [class.active]="subFilter === 'All'" (click)="setSubFilter('All')">All</button>
+      <button class="sub-pill" [class.active]="subFilter === 'Pending'" (click)="setSubFilter('Pending')">Pending (Awaiting Action)</button>
+      <button class="sub-pill" [class.active]="subFilter === 'Accepted'" (click)="setSubFilter('Accepted')">Accepted</button>
+      <button class="sub-pill" [class.active]="subFilter === 'Declined'" (click)="setSubFilter('Declined')">Declined</button>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading your connections and interests...</p>
+    </div>
+
+    <!-- TAB 1: RECEIVED INTERESTS -->
+    <div class="tab-content-area" *ngIf="!isLoading && activeTab === 'received'">
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="receivedList.length === 0">
+        <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+        <h3>No Received Interests Found</h3>
+        <p>Complete your profile score or explore matches to receive more connection requests.</p>
+        <div class="d-flex gap-3 justify-center mt-3">
+          <a routerLink="/matches" class="btn btn-primary"><i class="bi bi-stars"></i> Explore Matches</a>
+        </div>
+      </div>
+
+      <!-- Received Cards Grid -->
+      <div class="interest-cards-grid" *ngIf="receivedList.length > 0">
+        <div class="interest-card" *ngFor="let item of receivedList" (click)="openProfileModal(item)">
+          <div class="card-left-img">
+            <img [src]="item.imageUrl" [alt]="item.name" loading="lazy" />
+            <span class="score-badge"><i class="bi bi-heart-fill"></i> {{ item.matchScore }}%</span>
+          </div>
+
+          <div class="card-center-info">
+            <div class="info-top">
+              <div>
+                <h3 class="person-name">{{ item.name }} <i class="bi bi-patch-check-fill text-primary" *ngIf="item.verified"></i></h3>
+                <span class="person-sub">{{ item.profileId }} • {{ item.age }} Yrs, {{ item.height }} • {{ item.location }}</span>
+              </div>
+              <span class="status-chip" [ngClass]="{'chip-pending': item.status === 'Pending', 'chip-accepted': item.status === 'Accepted', 'chip-declined': item.status === 'Declined'}">
+                <i class="bi" [ngClass]="{'bi-hourglass-split': item.status === 'Pending', 'bi-check-circle-fill': item.status === 'Accepted', 'bi-x-circle-fill': item.status === 'Declined'}"></i>
+                {{ item.status }}
+              </span>
+            </div>
+
+            <div class="person-specs">
+              <span><i class="bi bi-mortarboard text-emerald"></i> {{ item.education }}</span>
+              <span><i class="bi bi-briefcase text-blue"></i> {{ item.profession }} ({{ item.annualIncome }})</span>
+              <span><i class="bi bi-person-check text-rose"></i> {{ item.religion }} - {{ item.caste }} ({{ item.motherTongue }})</span>
+            </div>
+
+            <!-- Custom Message Bubble -->
+            <div class="interest-message-box" *ngIf="item.customMessage">
+              <i class="bi bi-quote quote-icon"></i>
+              <p>"{{ item.customMessage }}"</p>
+            </div>
+
+            <div class="interest-footer-meta">
+              <span class="time-meta"><i class="bi bi-clock"></i> Sent {{ item.sentAt | date:'mediumDate' }}</span>
+              <span class="unlocked-indicator" *ngIf="item.isCommunicationUnlocked">
+                <i class="bi bi-unlock-fill text-success"></i> Communication Unlocked
+              </span>
+            </div>
+          </div>
+
+          <!-- Action Buttons Area -->
+          <div class="card-right-actions" (click)="$event.stopPropagation()">
+            <ng-container *ngIf="item.status === 'Pending'">
+              <button class="btn btn-accept" (click)="respondToInterest(item, 'Accepted', $event)">
+                <i class="bi bi-check-lg"></i> Accept Interest
+              </button>
+              <button class="btn btn-decline" (click)="respondToInterest(item, 'Declined', $event)">
+                <i class="bi bi-x-lg"></i> Decline
+              </button>
+            </ng-container>
+
+            <ng-container *ngIf="item.status === 'Accepted'">
+              <button class="btn btn-unlocked-action" (click)="openContactModal(item, $event)">
+                <i class="bi bi-telephone-fill"></i> View Contact
+              </button>
+              <a routerLink="/matches" class="btn btn-chat-action">
+                <i class="bi bi-chat-dots-fill"></i> Message
+              </a>
+            </ng-container>
+
+            <ng-container *ngIf="item.status === 'Declined'">
+              <span class="text-muted text-sm italic">Declined</span>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: CONNECTED MATCHES (COMMUNICATION UNLOCKED) -->
+    <div class="tab-content-area" *ngIf="!isLoading && activeTab === 'connected'">
+      <div class="empty-state" *ngIf="connectedList.length === 0">
+        <div class="empty-icon"><i class="bi bi-people"></i></div>
+        <h3>No Connected Matches Yet</h3>
+        <p>Accept incoming interests or send interests to your recommended matches to unlock communication.</p>
+        <div class="d-flex gap-3 justify-center mt-3">
+          <a routerLink="/matches" class="btn btn-primary"><i class="bi bi-stars"></i> Explore Matches</a>
+        </div>
+      </div>
+
+      <div class="connected-cards-grid" *ngIf="connectedList.length > 0">
+        <div class="connected-card" *ngFor="let item of connectedList">
+          <div class="connected-header">
+            <img [src]="item.imageUrl" [alt]="item.name" class="connected-avatar" />
+            <div class="connected-title">
+              <h4>{{ item.name }} <i class="bi bi-patch-check-fill text-primary" *ngIf="item.verified"></i></h4>
+              <p>{{ item.profileId }} • {{ item.profession }}</p>
+              <span class="unlocked-badge"><i class="bi bi-unlock-fill"></i> Direct Access Unlocked</span>
+            </div>
+          </div>
+
+          <div class="contact-specs-box">
+            <div class="contact-row">
+              <div class="contact-icon"><i class="bi bi-telephone-fill text-emerald"></i></div>
+              <div class="contact-detail">
+                <span class="lbl">Mobile Number:</span>
+                <span class="val font-mono">{{ item.contactMobile || '+91 98401 23456' }}</span>
+              </div>
+            </div>
+
+            <div class="contact-row">
+              <div class="contact-icon"><i class="bi bi-envelope-fill text-blue"></i></div>
+              <div class="contact-detail">
+                <span class="lbl">Email Address:</span>
+                <span class="val">{{ item.contactEmail || (item.name.toLowerCase().replace(' ', '.') + '@gmail.com') }}</span>
+              </div>
+            </div>
+
+            <div class="contact-row" *ngIf="item.preferredCallTime">
+              <div class="contact-icon"><i class="bi bi-clock-fill text-amber"></i></div>
+              <div class="contact-detail">
+                <span class="lbl">Best Time to Call:</span>
+                <span class="val">{{ item.preferredCallTime }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="connected-actions">
+            <a [href]="'tel:' + (item.contactMobile || '+919840123456')" class="btn btn-call">
+              <i class="bi bi-telephone-outbound-fill"></i> Call Now
+            </a>
+            <a [href]="'https://wa.me/91' + (item.contactMobile?.replace('+91', '')?.replace(' ', '') || '9840123456')" target="_blank" class="btn btn-whatsapp">
+              <i class="bi bi-whatsapp"></i> WhatsApp
+            </a>
+            <button class="btn btn-details-sm" (click)="openProfileModal(item)">
+              <i class="bi bi-person-lines-fill"></i> Profile
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: SENT INTERESTS -->
+    <div class="tab-content-area" *ngIf="!isLoading && activeTab === 'sent'">
+      <div class="empty-state" *ngIf="sentList.length === 0">
+        <div class="empty-icon"><i class="bi bi-send"></i></div>
+        <h3>No Sent Interests</h3>
+        <p>You have not sent interests to any profiles yet. Browse matches and click "Send Interest ❤️".</p>
+        <div class="d-flex gap-3 justify-center mt-3">
+          <a routerLink="/matches" class="btn btn-primary"><i class="bi bi-stars"></i> Explore Matches</a>
+        </div>
+      </div>
+
+      <div class="interest-cards-grid" *ngIf="sentList.length > 0">
+        <div class="interest-card" *ngFor="let item of sentList" (click)="openProfileModal(item)">
+          <div class="card-left-img">
+            <img [src]="item.imageUrl" [alt]="item.name" loading="lazy" />
+            <span class="score-badge"><i class="bi bi-heart-fill"></i> {{ item.matchScore }}%</span>
+          </div>
+
+          <div class="card-center-info">
+            <div class="info-top">
+              <div>
+                <h3 class="person-name">{{ item.name }} <i class="bi bi-patch-check-fill text-primary" *ngIf="item.verified"></i></h3>
+                <span class="person-sub">{{ item.profileId }} • {{ item.age }} Yrs, {{ item.height }} • {{ item.location }}</span>
+              </div>
+              <span class="status-chip" [ngClass]="{'chip-pending': item.status === 'Pending', 'chip-accepted': item.status === 'Accepted', 'chip-declined': item.status === 'Declined', 'chip-withdrawn': item.status === 'Withdrawn'}">
+                <i class="bi" [ngClass]="{'bi-hourglass-split': item.status === 'Pending', 'bi-check-circle-fill': item.status === 'Accepted', 'bi-x-circle-fill': item.status === 'Declined', 'bi-arrow-counterclockwise': item.status === 'Withdrawn'}"></i>
+                {{ item.status === 'Pending' ? 'Awaiting Response' : item.status }}
+              </span>
+            </div>
+
+            <div class="person-specs">
+              <span><i class="bi bi-mortarboard text-emerald"></i> {{ item.education }}</span>
+              <span><i class="bi bi-briefcase text-blue"></i> {{ item.profession }} ({{ item.annualIncome }})</span>
+              <span><i class="bi bi-person-check text-rose"></i> {{ item.religion }} - {{ item.caste }}</span>
+            </div>
+
+            <div class="interest-message-box" *ngIf="item.customMessage">
+              <i class="bi bi-quote quote-icon"></i>
+              <p>"{{ item.customMessage }}"</p>
+            </div>
+
+            <div class="interest-footer-meta">
+              <span class="time-meta"><i class="bi bi-clock"></i> Sent on {{ item.sentAt | date:'mediumDate' }}</span>
+              <span class="unlocked-indicator" *ngIf="item.isCommunicationUnlocked">
+                <i class="bi bi-unlock-fill text-success"></i> Connected! Contact details unlocked
+              </span>
+            </div>
+          </div>
+
+          <div class="card-right-actions" (click)="$event.stopPropagation()">
+            <ng-container *ngIf="item.status === 'Pending'">
+              <button class="btn btn-withdraw" (click)="withdrawSentInterest(item, $event)">
+                <i class="bi bi-arrow-counterclockwise"></i> Withdraw
+              </button>
+            </ng-container>
+
+            <ng-container *ngIf="item.status === 'Accepted'">
+              <button class="btn btn-unlocked-action" (click)="openContactModal(item, $event)">
+                <i class="bi bi-telephone-fill"></i> View Contact
+              </button>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT UNLOCKED MODAL -->
+  <div class="modal-backdrop" *ngIf="selectedContactForModal" (click)="closeContactModal()">
+    <div class="modal-card contact-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="d-flex items-center gap-3">
+          <img [src]="selectedContactForModal.imageUrl" class="modal-avatar" alt="Avatar" />
+          <div>
+            <h3>{{ selectedContactForModal.name }}</h3>
+            <span class="modal-subtitle"><i class="bi bi-patch-check-fill text-primary"></i> 100% Verified Contact Information</span>
+          </div>
+        </div>
+        <button class="btn-close-modal" (click)="closeContactModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="modal-body-content">
+        <div class="unlocked-banner">
+          <i class="bi bi-shield-lock-fill text-gold"></i>
+          <div>
+            <strong>Communication Unlocked</strong>
+            <p>Both of you have accepted interest. You can now initiate direct calls, send emails, or chat on WhatsApp.</p>
+          </div>
+        </div>
+
+        <div class="contact-details-list">
+          <div class="contact-card-box">
+            <i class="bi bi-telephone-fill text-emerald icon-lg"></i>
+            <div class="contact-text-wrap">
+              <span class="label">Mobile Number</span>
+              <span class="value">{{ selectedContactForModal.contactMobile || '+91 98401 23456' }}</span>
+            </div>
+            <a [href]="'tel:' + (selectedContactForModal.contactMobile || '+919840123456')" class="btn btn-sm btn-call">Call</a>
+          </div>
+
+          <div class="contact-card-box">
+            <i class="bi bi-whatsapp text-emerald icon-lg"></i>
+            <div class="contact-text-wrap">
+              <span class="label">WhatsApp Direct</span>
+              <span class="value">Chat Directly on WhatsApp</span>
+            </div>
+            <a [href]="'https://wa.me/91' + (selectedContactForModal.contactMobile?.replace('+91', '')?.replace(' ', '') || '9840123456')" target="_blank" class="btn btn-sm btn-whatsapp">WhatsApp</a>
+          </div>
+
+          <div class="contact-card-box">
+            <i class="bi bi-envelope-fill text-blue icon-lg"></i>
+            <div class="contact-text-wrap">
+              <span class="label">Email Address</span>
+              <span class="value">{{ selectedContactForModal.contactEmail || (selectedContactForModal.name.toLowerCase().replace(' ', '.') + '@gmail.com') }}</span>
+            </div>
+            <a [href]="'mailto:' + (selectedContactForModal.contactEmail || 'user@milansetu.com')" class="btn btn-sm btn-outline">Email</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" (click)="closeContactModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE MODAL -->
+  <div class="modal-backdrop" *ngIf="selectedItemForModal" (click)="closeProfileModal()">
+    <div class="modal-card profile-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="d-flex items-center gap-3">
+          <img [src]="selectedItemForModal.imageUrl" class="modal-avatar" alt="Avatar" />
+          <div>
+            <h3>{{ selectedItemForModal.name }}</h3>
+            <span class="modal-subtitle">{{ selectedItemForModal.profileId }} • {{ selectedItemForModal.age }} Yrs, {{ selectedItemForModal.height }} • {{ selectedItemForModal.location }}</span>
+          </div>
+        </div>
+        <button class="btn-close-modal" (click)="closeProfileModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="modal-body-content">
+        <div class="spec-grid">
+          <div class="spec-item"><span class="spec-label">Education:</span> <span class="spec-val">{{ selectedItemForModal.education }}</span></div>
+          <div class="spec-item"><span class="spec-label">Profession:</span> <span class="spec-val">{{ selectedItemForModal.profession }}</span></div>
+          <div class="spec-item"><span class="spec-label">Income:</span> <span class="spec-val text-gold font-bold">{{ selectedItemForModal.annualIncome }}</span></div>
+          <div class="spec-item"><span class="spec-label">Religion / Caste:</span> <span class="spec-val">{{ selectedItemForModal.religion }} - {{ selectedItemForModal.caste }}</span></div>
+          <div class="spec-item"><span class="spec-label">Mother Tongue:</span> <span class="spec-val">{{ selectedItemForModal.motherTongue }}</span></div>
+          <div class="spec-item"><span class="spec-label">Location:</span> <span class="spec-val">{{ selectedItemForModal.location }}</span></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="closeProfileModal()">Close</button>
+        <button class="btn btn-accept" *ngIf="selectedItemForModal.status === 'Pending'" (click)="respondToInterest(selectedItemForModal, 'Accepted', $event); closeProfileModal()">
+          <i class="bi bi-check-lg"></i> Accept Interest
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-popup" *ngIf="toastMessage">
+    <i class="bi bi-check-circle-fill text-gold"></i>
+    <span>{{ toastMessage }}</span>
+  </div>
+</div>
