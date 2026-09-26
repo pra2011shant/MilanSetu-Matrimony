@@ -1,1 +1,128 @@
-/* You can add global styles to this file, and also import other style files */
+/* ----------------------------------------------------
+   MilanSetu - Luxury Modern Design System
+   ---------------------------------------------------- */
+
+:root {
+  --primary-50: #fff1f2;
+  --primary-100: #ffe4e6;
+  --primary-200: #fecdd3;
+  --primary-300: #fda4af;
+  --primary-400: #fb7185;
+  --primary-500: #f43f5e;
+  --primary-600: #e11d48;
+  --primary-700: #be123c;
+  --primary-800: #9f1239;
+  --primary-900: #881337;
+
+  --gold-300: #fde68a;
+  --gold-400: #fcd34d;
+  --gold-500: #f59e0b;
+  --gold-600: #d97706;
+
+  --navy-900: #0f172a;
+  --navy-800: #1e293b;
+  --navy-700: #334155;
+  --navy-600: #475569;
+  --navy-50: #f8fafc;
+
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 14px -2px rgba(0,0,0,0.08), 0 2px 6px -1px rgba(0,0,0,0.04);
+  --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.1), 0 4px 10px -2px rgba(0,0,0,0.05);
+  --shadow-xl: 0 20px 35px -5px rgba(225, 29, 72, 0.15), 0 8px 16px -4px rgba(0, 0, 0, 0.06);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--navy-800);
+  background-color: #fdfbfb;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, .font-serif {
+  font-family: var(--font-serif);
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.25s ease;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+
+/* Luxury Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--gold-600) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(225, 29, 72, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(225, 29, 72, 0.6);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #e28a9b;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-600);
+}
+

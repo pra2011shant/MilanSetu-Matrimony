@@ -1,0 +1,69 @@
+<header class="navbar-wrapper">
+  <div class="top-announcement">
+    <div class="container d-flex justify-between items-center">
+      <div class="announcement-text">
+        <span class="badge-special">✨ Premium Offer</span>
+        <span>Register Free & Explore 100% Verified Profiles Today!</span>
+      </div>
+      <div class="top-contact">
+        <span><i class="bi bi-telephone-fill"></i> +91 98765 43210</span>
+        <span class="divider">|</span>
+        <span><i class="bi bi-shield-check"></i> 100% Verified Profiles</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="main-navbar">
+    <div class="container navbar-container">
+      <!-- Brand Logo -->
+      <a href="/" class="brand-logo">
+        <div class="logo-icon-wrap">
+          <i class="bi bi-hearts"></i>
+        </div>
+        <div class="logo-text">
+          <span class="logo-title">Milan<span class="highlight">Setu</span></span>
+          <span class="logo-tagline">Bridging Sacred Hearts</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Menu -->
+      <ul class="nav-links">
+        <li><a href="#home" class="active"><i class="bi bi-house-door"></i> Home</a></li>
+        <li><a href="#search"><i class="bi bi-search-heart"></i> Search</a></li>
+        <li><a href="#featured"><i class="bi bi-stars"></i> Featured Profiles</a></li>
+        <li><a href="#stories"><i class="bi bi-chat-heart"></i> Success Stories</a></li>
+        <li><a href="#features"><i class="bi bi-shield-lock"></i> Trust & Safety</a></li>
+      </ul>
+
+      <!-- Auth Action Buttons -->
+      <div class="nav-actions">
+        <button class="btn btn-outline">
+          <i class="bi bi-box-arrow-in-right"></i> Login
+        </button>
+        <button class="btn btn-primary btn-glow">
+          <i class="bi bi-person-plus-fill"></i> Register Free
+        </button>
+      </div>
+
+      <!-- Mobile Hamburger -->
+      <button class="mobile-toggle" (click)="toggleMenu()" aria-label="Toggle navigation">
+        <i class="bi" [ngClass]="isMenuOpen ? 'bi-x-lg' : 'bi-list'"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Nav Drawer -->
+    <div class="mobile-menu" [class.open]="isMenuOpen">
+      <ul class="mobile-nav-links">
+        <li><a href="#home" (click)="toggleMenu()"><i class="bi bi-house-door"></i> Home</a></li>
+        <li><a href="#search" (click)="toggleMenu()"><i class="bi bi-search-heart"></i> Search Matches</a></li>
+        <li><a href="#featured" (click)="toggleMenu()"><i class="bi bi-stars"></i> Featured Profiles</a></li>
+        <li><a href="#stories" (click)="toggleMenu()"><i class="bi bi-chat-heart"></i> Success Stories</a></li>
+        <li><a href="#features" (click)="toggleMenu()"><i class="bi bi-shield-lock"></i> Trust & Safety</a></li>
+      </ul>
+      <div class="mobile-actions">
+        <button class="btn btn-outline w-100 mb-2"><i class="bi bi-box-arrow-in-right"></i> Login</button>
+        <button class="btn btn-primary w-100"><i class="bi bi-person-plus-fill"></i> Register Free</button>
+      </div>
+    </div>
+  </nav>
+</header>

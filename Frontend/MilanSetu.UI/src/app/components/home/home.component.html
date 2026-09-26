@@ -1,0 +1,387 @@
+<div class="home-page">
+
+  <!-- ========================================================================= -->
+  <!-- 1. HERO BANNER & INTERACTIVE SEARCH WIDGET                               -->
+  <!-- ========================================================================= -->
+  <section id="home" class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="container hero-container">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <i class="bi bi-patch-check-fill text-gold"></i>
+          <span>India's Most Trusted Sacred Matchmaking Portal</span>
+        </div>
+        <h1 class="hero-title">
+          Connecting <span class="gradient-text">Hearts</span>, Bridging <span class="gradient-text">Souls</span> For A Lifetime
+        </h1>
+        <p class="hero-subtitle">
+          Discover compatible, authentic life partners from verified families across India & worldwide with highest privacy standards.
+        </p>
+
+        <!-- Floating Quick Search Box -->
+        <div id="search" class="search-box-card">
+          <div class="search-card-header">
+            <span class="search-header-title">
+              <i class="bi bi-search-heart text-primary"></i> Quick Partner Search
+            </span>
+            <span class="search-sub-tag">100% Free Search</span>
+          </div>
+
+          <form class="search-form-grid" (ngSubmit)="onSearch()">
+            <!-- 1. I'm looking for -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-person-heart"></i> I'm looking for</label>
+              <select [(ngModel)]="searchCriteria.lookingFor" name="lookingFor" class="form-control">
+                <option value="Bride">A Bride (Woman)</option>
+                <option value="Groom">A Groom (Man)</option>
+              </select>
+            </div>
+
+            <!-- 2. Age Range -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-calendar3"></i> Age Range</label>
+              <div class="age-range-inputs">
+                <select [(ngModel)]="searchCriteria.minAge" name="minAge" class="form-control range-select">
+                  <option *ngFor="let age of ageOptions" [value]="age">{{ age }} Yrs</option>
+                </select>
+                <span class="range-separator">to</span>
+                <select [(ngModel)]="searchCriteria.maxAge" name="maxAge" class="form-control range-select">
+                  <option *ngFor="let age of ageOptions" [value]="age" [disabled]="age < searchCriteria.minAge">{{ age }} Yrs</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 3. Religion -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-star"></i> Religion</label>
+              <select [(ngModel)]="searchCriteria.religion" name="religion" class="form-control">
+                <option *ngFor="let rel of religions" [value]="rel">{{ rel }}</option>
+              </select>
+            </div>
+
+            <!-- 4. Mother Tongue -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-translate"></i> Mother Tongue</label>
+              <select [(ngModel)]="searchCriteria.motherTongue" name="motherTongue" class="form-control">
+                <option *ngFor="let lang of motherTongues" [value]="lang">{{ lang }}</option>
+              </select>
+            </div>
+
+            <!-- 5. Search Button -->
+            <div class="form-group button-group">
+              <button type="submit" class="btn btn-search">
+                <i class="bi bi-search"></i> Let's Search
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 2. TRUST STATS STRIP                                                      -->
+  <!-- ========================================================================= -->
+  <section class="trust-stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon-wrap"><i class="bi bi-heart-pulse-fill"></i></div>
+          <div class="stat-info">
+            <span class="stat-number">50,000+</span>
+            <span class="stat-label">Happy Marriages</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap"><i class="bi bi-shield-fill-check"></i></div>
+          <div class="stat-info">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">ID Verified Profiles</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap"><i class="bi bi-star-fill text-gold"></i></div>
+          <div class="stat-info">
+            <span class="stat-number">4.9 / 5</span>
+            <span class="stat-label">User Trust Score</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap"><i class="bi bi-lock-fill"></i></div>
+          <div class="stat-info">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Privacy Shield</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 3. FEATURED PROFILES SECTION                                             -->
+  <!-- ========================================================================= -->
+  <section id="featured" class="featured-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">✨ Handpicked For You</span>
+        <h2 class="section-title">Featured Matrimonial Profiles</h2>
+        <p class="section-desc">Explore genuine, highly educated and verified candidates ready for marriage.</p>
+        
+        <!-- Tab Navigation Filters -->
+        <div class="filter-tabs">
+          <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="applyTabFilter('all')">
+            <i class="bi bi-grid-fill"></i> All Matches ({{ allProfiles.length }})
+          </button>
+          <button class="tab-btn" [class.active]="activeTab === 'brides'" (click)="applyTabFilter('brides')">
+            <i class="bi bi-gender-female"></i> Brides
+          </button>
+          <button class="tab-btn" [class.active]="activeTab === 'grooms'" (click)="applyTabFilter('grooms')">
+            <i class="bi bi-gender-male"></i> Grooms
+          </button>
+          <button class="tab-btn" [class.active]="activeTab === 'premium'" (click)="applyTabFilter('premium')">
+            <i class="bi bi-gem"></i> Premium Members
+          </button>
+        </div>
+      </div>
+
+      <!-- Profile Cards Grid -->
+      <div class="profiles-grid" *ngIf="filteredProfiles.length > 0; else noResults">
+        <div class="profile-card" *ngFor="let profile of filteredProfiles" (click)="openProfileModal(profile)">
+          <!-- Profile Card Image & Badges -->
+          <div class="profile-img-wrap">
+            <img [src]="profile.imageUrl" [alt]="profile.name" class="profile-img" loading="lazy" />
+            
+            <div class="badge-top-left" *ngIf="profile.premium">
+              <span class="premium-badge"><i class="bi bi-gem"></i> Premium</span>
+            </div>
+
+            <div class="badge-top-right" *ngIf="profile.verified">
+              <span class="verified-badge"><i class="bi bi-patch-check-fill"></i> Verified</span>
+            </div>
+
+            <div class="profile-id-pill">ID: {{ profile.id }}</div>
+          </div>
+
+          <!-- Profile Body -->
+          <div class="profile-body">
+            <div class="profile-head">
+              <h3 class="profile-name">{{ profile.name }}</h3>
+              <span class="profile-age">{{ profile.age }} Yrs, {{ profile.height }}</span>
+            </div>
+
+            <div class="profile-meta-list">
+              <div class="meta-item">
+                <i class="bi bi-briefcase-fill"></i>
+                <span>{{ profile.profession }} <strong *ngIf="profile.company">at {{ profile.company }}</strong></span>
+              </div>
+              <div class="meta-item">
+                <i class="bi bi-mortarboard-fill"></i>
+                <span>{{ profile.education }}</span>
+              </div>
+              <div class="meta-item">
+                <i class="bi bi-geo-alt-fill"></i>
+                <span>{{ profile.location }}</span>
+              </div>
+              <div class="meta-item">
+                <i class="bi bi-people-fill"></i>
+                <span>{{ profile.religion }} • {{ profile.motherTongue }} <span *ngIf="profile.caste">({{ profile.caste }})</span></span>
+              </div>
+            </div>
+
+            <p class="profile-about-snippet">
+              "{{ profile.about }}"
+            </p>
+
+            <!-- Card Actions -->
+            <div class="card-actions">
+              <button class="btn btn-connect" [class.connected]="profile.interestSent" (click)="sendInterest(profile, $event)">
+                <i class="bi" [ngClass]="profile.interestSent ? 'bi-check-circle-fill' : 'bi-heart-fill'"></i>
+                {{ profile.interestSent ? 'Interest Sent' : 'Send Interest' }}
+              </button>
+              <button class="btn btn-view" (click)="openProfileModal(profile)">
+                <i class="bi bi-eye"></i> View
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noResults>
+        <div class="no-results-box">
+          <i class="bi bi-search-heart text-muted"></i>
+          <h3>No matching profiles found for the selected criteria</h3>
+          <p>Try broadening your age range, religion, or language filters to view more profiles.</p>
+          <button class="btn btn-primary mt-3" (click)="applyTabFilter('all')">View All Profiles</button>
+        </div>
+      </ng-template>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 4. HOW IT WORKS (3 SIMPLE STEPS)                                         -->
+  <!-- ========================================================================= -->
+  <section class="how-it-works-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">✨ Seamless & Trusted</span>
+        <h2 class="section-title">How MilanSetu Works</h2>
+        <p class="section-desc">Find your ideal match in 3 effortless steps</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <div class="step-icon"><i class="bi bi-person-plus"></i></div>
+          <h3>Create Profile</h3>
+          <p>Register for free, complete your biodata, preferences, and verify your mobile & govt ID.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <div class="step-icon"><i class="bi bi-sliders2-vertical"></i></div>
+          <h3>Discover Matches</h3>
+          <p>Use smart filters for religion, community, education, location, and astrological compatibility.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <div class="step-icon"><i class="bi bi-chat-heart"></i></div>
+          <h3>Connect & Marry</h3>
+          <p>Express interest, safely chat, involve families, and begin your forever marriage journey.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 5. SUCCESS STORIES SECTION                                                -->
+  <!-- ========================================================================= -->
+  <section id="stories" class="stories-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-badge">💍 Real Love Stories</span>
+        <h2 class="section-title">Happy MilanSetu Couples</h2>
+        <p class="section-desc">Real stories of couples who found their soulmates on MilanSetu</p>
+      </div>
+
+      <div class="stories-grid">
+        <div class="story-card" *ngFor="let story of successStories">
+          <div class="story-img-container">
+            <img [src]="story.imageUrl" [alt]="story.coupleName" class="story-img" loading="lazy" />
+            <div class="story-overlay-tag">
+              <i class="bi bi-calendar2-heart"></i> {{ story.weddingDate }}
+            </div>
+          </div>
+          <div class="story-body">
+            <div class="story-stars">
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+              <i class="bi bi-star-fill"></i>
+            </div>
+            <h3 class="couple-name">{{ story.coupleName }}</h3>
+            <span class="couple-location"><i class="bi bi-geo-alt"></i> {{ story.location }}</span>
+            <p class="story-quote">{{ story.quote }}</p>
+            <p class="story-snippet">{{ story.storySnippet }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 6. CALL TO ACTION BANNER                                                 -->
+  <!-- ========================================================================= -->
+  <section class="cta-section">
+    <div class="container cta-container">
+      <div class="cta-card">
+        <div class="cta-content">
+          <h2>Your Perfect Match Is Just A Click Away!</h2>
+          <p>Join over 50,000+ members who trust MilanSetu for sincere and lifelong companionship.</p>
+          <div class="cta-buttons">
+            <button class="btn btn-cta-primary"><i class="bi bi-person-check-fill"></i> Create Free Profile</button>
+            <button class="btn btn-cta-secondary"><i class="bi bi-telephone-outbound"></i> Speak to Matchmaker</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 7. PROFILE DETAILS MODAL (POPUP)                                         -->
+  <!-- ========================================================================= -->
+  <div class="modal-backdrop" *ngIf="selectedProfile" (click)="closeProfileModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <button class="modal-close-btn" (click)="closeProfileModal()"><i class="bi bi-x-lg"></i></button>
+
+      <div class="modal-profile-header">
+        <div class="modal-avatar-wrap">
+          <img [src]="selectedProfile.imageUrl" [alt]="selectedProfile.name" class="modal-avatar" />
+          <span class="modal-verified" *ngIf="selectedProfile.verified"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        </div>
+        <div class="modal-header-info">
+          <h2>{{ selectedProfile.name }}</h2>
+          <span class="modal-id">Profile ID: {{ selectedProfile.id }}</span>
+          <div class="modal-badges">
+            <span class="badge-tag">{{ selectedProfile.age }} Yrs, {{ selectedProfile.height }}</span>
+            <span class="badge-tag">{{ selectedProfile.religion }} • {{ selectedProfile.motherTongue }}</span>
+            <span class="badge-tag badge-premium" *ngIf="selectedProfile.premium"><i class="bi bi-gem"></i> Premium</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-section">
+          <h4><i class="bi bi-person-lines-fill text-primary"></i> About Me</h4>
+          <p>{{ selectedProfile.about }}</p>
+        </div>
+
+        <div class="modal-section-grid">
+          <div class="info-block">
+            <span class="label">Profession</span>
+            <span class="val">{{ selectedProfile.profession }}</span>
+          </div>
+          <div class="info-block">
+            <span class="label">Company</span>
+            <span class="val">{{ selectedProfile.company || 'Not Specified' }}</span>
+          </div>
+          <div class="info-block">
+            <span class="label">Education</span>
+            <span class="val">{{ selectedProfile.education }}</span>
+          </div>
+          <div class="info-block">
+            <span class="label">Location</span>
+            <span class="val">{{ selectedProfile.location }}</span>
+          </div>
+          <div class="info-block">
+            <span class="label">Community / Caste</span>
+            <span class="val">{{ selectedProfile.caste || 'Open to all' }}</span>
+          </div>
+          <div class="info-block">
+            <span class="label">ID Verification</span>
+            <span class="val text-success"><i class="bi bi-shield-fill-check"></i> 100% Aadhaar/Govt ID Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="closeProfileModal()">Close</button>
+        <button class="btn btn-primary" (click)="sendInterest(selectedProfile, $event)">
+          <i class="bi" [ngClass]="selectedProfile.interestSent ? 'bi-check-circle-fill' : 'bi-heart-fill'"></i>
+          {{ selectedProfile.interestSent ? 'Interest Sent' : 'Send Interest & Connect' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-popup" *ngIf="toastMessage">
+    <i class="bi bi-bell-fill"></i>
+    <span>{{ toastMessage }}</span>
+  </div>
+
+</div>
