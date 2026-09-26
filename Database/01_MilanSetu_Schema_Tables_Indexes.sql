@@ -33,6 +33,8 @@ BEGIN
         Location NVARCHAR(150) NOT NULL,
         ProfilePhotoUrl NVARCHAR(MAX) NULL,
         IsVerified BIT NOT NULL CONSTRAINT DF_Users_IsVerified DEFAULT (1),
+        Role NVARCHAR(20) NOT NULL CONSTRAINT DF_Users_Role DEFAULT ('User'),
+        IsBlocked BIT NOT NULL CONSTRAINT DF_Users_IsBlocked DEFAULT (0),
         PreferredLanguage NVARCHAR(10) NOT NULL CONSTRAINT DF_Users_PreferredLanguage DEFAULT ('en'),
         CreatedAt DATETIME2(7) NOT NULL CONSTRAINT DF_Users_CreatedAt DEFAULT (SYSUTCDATETIME()),
         CONSTRAINT PK_Users PRIMARY KEY CLUSTERED (Id ASC)

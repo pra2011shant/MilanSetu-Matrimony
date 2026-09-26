@@ -98,6 +98,17 @@ namespace MilanSetu.API.Models
         public bool IsVerified { get; set; } = true;
 
         /// <summary>
+        /// Column: Role (NVARCHAR(20), NOT NULL, Default: 'User') - 'User' or 'Admin'
+        /// </summary>
+        [MaxLength(20)]
+        public string Role { get; set; } = "User";
+
+        /// <summary>
+        /// Column: IsBlocked (BIT, NOT NULL, Default: 0) - Admin ban status
+        /// </summary>
+        public bool IsBlocked { get; set; } = false;
+
+        /// <summary>
         /// Column: PreferredLanguage (NVARCHAR(10), NOT NULL, Default: 'en') - 'en', 'hi', 'bn', 'mr', 'ta', 'te', 'gu', 'kn'
         /// </summary>
         [MaxLength(10)]

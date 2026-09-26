@@ -1,0 +1,371 @@
+<div class="admin-dashboard-container">
+  <!-- Admin Top Bar Header -->
+  <header class="admin-topbar">
+    <div class="topbar-brand">
+      <div class="brand-badge">
+        <i class="bi bi-shield-lock-fill"></i>
+      </div>
+      <div>
+        <h2>MilanSetu <span class="badge-admin">Admin Control Center</span></h2>
+        <p class="subtitle">Platform Governance, Member Verifications & Master Controls</p>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <a routerLink="/" class="btn-portal-view"><i class="bi bi-globe"></i> View User Site</a>
+      <div class="admin-profile-pill">
+        <span class="status-dot"></span>
+        <span>Super Admin</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="admin-nav-tabs">
+    <button class="nav-tab-btn" [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'">
+      <i class="bi bi-speedometer2"></i> Analytics Overview
+    </button>
+    <button class="nav-tab-btn" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'">
+      <i class="bi bi-people-fill"></i> Member Management ({{ users.length }})
+    </button>
+    <button class="nav-tab-btn" [class.active]="activeTab === 'verifications'" (click)="activeTab = 'verifications'">
+      <i class="bi bi-patch-check-fill"></i> Verification Queue
+    </button>
+    <button class="nav-tab-btn" [class.active]="activeTab === 'stories'" (click)="activeTab = 'stories'">
+      <i class="bi bi-heart-fill"></i> Success Stories ({{ stories.length }})
+    </button>
+    <button class="nav-tab-btn" [class.active]="activeTab === 'masterdata'" (click)="activeTab = 'masterdata'">
+      <i class="bi bi-database-gear"></i> Master Data Controls
+    </button>
+  </nav>
+
+  <!-- ========================================================================= -->
+  <!-- 1. OVERVIEW TAB: KPIS & PLATFORM METRICS                                  -->
+  <!-- ========================================================================= -->
+  <div *ngIf="activeTab === 'overview'" class="tab-content">
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon icon-users"><i class="bi bi-people"></i></div>
+        <div class="kpi-info">
+          <span class="kpi-label">Total Registered Members</span>
+          <span class="kpi-value">{{ stats.totalUsers }}</span>
+          <span class="kpi-meta text-success"><i class="bi bi-arrow-up-right"></i> Active Platform Base</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon icon-verified"><i class="bi bi-patch-check"></i></div>
+        <div class="kpi-info">
+          <span class="kpi-label">Verified Profiles</span>
+          <span class="kpi-value">{{ stats.verifiedUsers }}</span>
+          <span class="kpi-meta text-primary">{{ ((stats.verifiedUsers / (stats.totalUsers || 1)) * 100).toFixed(0) }}% Verification Rate</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon icon-interests"><i class="bi bi-heart"></i></div>
+        <div class="kpi-info">
+          <span class="kpi-label">Expressed Interests</span>
+          <span class="kpi-value">{{ stats.totalInterests }}</span>
+          <span class="kpi-meta text-success">{{ stats.acceptedInterests }} Accepted Matches</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon icon-messages"><i class="bi bi-chat-dots"></i></div>
+        <div class="kpi-info">
+          <span class="kpi-label">Chat Conversations</span>
+          <span class="kpi-value">{{ stats.totalMessages }}</span>
+          <span class="kpi-meta">Real-time SignalR Messages</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Secondary Metrics Row -->
+    <div class="overview-split-row">
+      <div class="metric-box">
+        <h3><i class="bi bi-gender-ambiguous"></i> Member Gender Distribution</h3>
+        <div class="gender-bar-wrap">
+          <div class="gender-stat">
+            <span class="text-blue">Groom / Male: <strong>{{ stats.maleUsers }}</strong></span>
+            <span class="text-rose">Bride / Female: <strong>{{ stats.femaleUsers }}</strong></span>
+          </div>
+          <div class="progress-bar-stacked">
+            <div class="bar-male" [style.width.%]="(stats.maleUsers / (stats.totalUsers || 1)) * 100"></div>
+            <div class="bar-female" [style.width.%]="(stats.femaleUsers / (stats.totalUsers || 1)) * 100"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-box">
+        <h3><i class="bi bi-shield-check"></i> Platform Trust & Safety</h3>
+        <ul class="trust-list">
+          <li><i class="bi bi-check2-circle text-success"></i> 256-bit BCrypt Password Encryption Active</li>
+          <li><i class="bi bi-check2-circle text-success"></i> Time-bound 6-digit Email OTP Verification</li>
+          <li><i class="bi bi-check2-circle text-success"></i> Real-time Profile View Notifications</li>
+          <li><i class="bi bi-check2-circle text-success"></i> 7-Factor Compatibility Matching Engine</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 2. USERS TAB: MEMBER DIRECTORY & VERIFICATION TOGGLE                      -->
+  <!-- ========================================================================= -->
+  <div *ngIf="activeTab === 'users'" class="tab-content">
+    <div class="table-card">
+      <div class="table-header-filters">
+        <div class="search-input-wrap">
+          <i class="bi bi-search"></i>
+          <input
+            type="text"
+            placeholder="Search by name, email, mobile, city..."
+            [(ngModel)]="userSearch"
+            (input)="loadUsers()"
+            class="filter-input"
+          />
+        </div>
+
+        <div class="filter-dropdowns">
+          <select [(ngModel)]="selectedGenderFilter" (change)="loadUsers()" class="filter-select">
+            <option value="All">All Genders</option>
+            <option value="Male">Groom (Male)</option>
+            <option value="Female">Bride (Female)</option>
+          </select>
+
+          <select [(ngModel)]="selectedVerificationFilter" (change)="loadUsers()" class="filter-select">
+            <option value="All">All Verification States</option>
+            <option value="Verified">Verified Only ✓</option>
+            <option value="Pending">Pending Verification ✗</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Member</th>
+              <th>Matrimony ID</th>
+              <th>Community & Religion</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of users" [class.blocked-row]="u.isBlocked">
+              <td>
+                <div class="member-cell">
+                  <img [src]="u.profilePhotoUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'" alt="Avatar" class="avatar-small">
+                  <div>
+                    <div class="member-name">
+                      {{ u.name }}
+                      <span *ngIf="u.isVerified" class="badge-verified-mini" title="Verified"><i class="bi bi-patch-check-fill"></i></span>
+                      <span *ngIf="u.isBlocked" class="badge-blocked-mini">Blocked</span>
+                    </div>
+                    <div class="member-sub">{{ u.email }} • {{ u.mobile }}</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="id-badge">MS-{{ u.id }}</span></td>
+              <td>
+                <div class="text-sm font-medium">{{ u.religion }} ({{ u.caste || 'Caste No Bar' }})</div>
+                <div class="text-xs text-muted">{{ u.motherTongue }}</div>
+              </td>
+              <td><span class="text-sm"><i class="bi bi-geo-alt"></i> {{ u.location }}</span></td>
+              <td>
+                <span class="badge" [ngClass]="u.isVerified ? 'badge-active' : 'badge-pending'">
+                  {{ u.isVerified ? 'Verified ✓' : 'Pending Verification' }}
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button
+                    class="btn-action"
+                    [ngClass]="u.isVerified ? 'btn-unverify' : 'btn-verify'"
+                    (click)="toggleVerification(u)"
+                    [title]="u.isVerified ? 'Mark as Unverified' : 'Approve & Verify Profile'"
+                  >
+                    <i class="bi" [ngClass]="u.isVerified ? 'bi-shield-x' : 'bi-patch-check'"></i>
+                  </button>
+
+                  <button
+                    class="btn-action"
+                    [ngClass]="u.isBlocked ? 'btn-unblock' : 'btn-block'"
+                    (click)="toggleBlock(u)"
+                    [title]="u.isBlocked ? 'Unblock Account' : 'Block & Suspend Account'"
+                  >
+                    <i class="bi" [ngClass]="u.isBlocked ? 'bi-unlock-fill' : 'bi-slash-circle'"></i>
+                  </button>
+
+                  <button class="btn-action btn-delete" (click)="deleteUser(u)" title="Delete User">
+                    <i class="bi bi-trash3-fill"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="users.length === 0">
+              <td colspan="6" class="text-center py-4 text-muted">No members match the filtered criteria.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 3. VERIFICATION QUEUE TAB                                                 -->
+  <!-- ========================================================================= -->
+  <div *ngIf="activeTab === 'verifications'" class="tab-content">
+    <div class="queue-card">
+      <div class="card-header-flex">
+        <div>
+          <h3><i class="bi bi-person-check-fill text-rose"></i> Pending Profile & Document Approvals</h3>
+          <p class="text-muted">Review member profiles awaiting verification badges.</p>
+        </div>
+      </div>
+
+      <div class="queue-grid">
+        <ng-container *ngFor="let u of users">
+          <div *ngIf="!u.isVerified" class="verification-card">
+            <img [src]="u.profilePhotoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80'" class="queue-photo" alt="Candidate">
+            <div class="queue-details">
+              <h4>{{ u.name }} <span class="id-badge">MS-{{ u.id }}</span></h4>
+              <p class="queue-meta"><i class="bi bi-envelope"></i> {{ u.email }}</p>
+              <p class="queue-meta"><i class="bi bi-telephone"></i> {{ u.mobile }}</p>
+              <p class="queue-meta"><i class="bi bi-geo-alt"></i> {{ u.location }}</p>
+              <div class="queue-actions">
+                <button class="btn-approve" (click)="toggleVerification(u)">
+                  <i class="bi bi-patch-check-fill"></i> Approve & Verify
+                </button>
+                <button class="btn-reject" (click)="deleteUser(u)">
+                  <i class="bi bi-x-circle"></i> Reject
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 4. STORIES TAB: MANAGE FEATURED SUCCESS STORIES                           -->
+  <!-- ========================================================================= -->
+  <div *ngIf="activeTab === 'stories'" class="tab-content">
+    <div class="stories-header-row">
+      <div>
+        <h3>Verified Couple Success Stories</h3>
+        <p class="text-muted">Manage matrimonial success stories displayed on the homepage.</p>
+      </div>
+      <button class="btn-add-primary" (click)="openAddStoryModal()">
+        <i class="bi bi-plus-circle-fill"></i> Add New Success Story
+      </button>
+    </div>
+
+    <div class="stories-grid-admin">
+      <div *ngFor="let s of stories" class="story-admin-card">
+        <img [src]="s.imageUrl" alt="Couple" class="story-admin-img">
+        <div class="story-admin-body">
+          <div class="story-couple-title">{{ s.coupleName }}</div>
+          <div class="story-date-loc"><i class="bi bi-calendar-heart"></i> {{ s.weddingDate }} • <i class="bi bi-geo-alt"></i> {{ s.location }}</div>
+          <div class="story-admin-quote">{{ s.quote }}</div>
+          <p class="story-admin-snippet">{{ s.storySnippet }}</p>
+          <div class="story-card-footer">
+            <span class="badge-featured"><i class="bi bi-star-fill"></i> Live on Homepage</span>
+            <button class="btn-delete-story" (click)="deleteStory(s)"><i class="bi bi-trash"></i> Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 5. MASTER DATA TAB: CONTROL RELIGIONS, TONGUES, CITIES                    -->
+  <!-- ========================================================================= -->
+  <div *ngIf="activeTab === 'masterdata'" class="tab-content">
+    <div class="master-data-grid">
+      <!-- Religions Master -->
+      <div class="master-card">
+        <h3><i class="bi bi-flower1"></i> Master Religions ({{ religionsList.length }})</h3>
+        <div class="add-inline-form">
+          <input type="text" [(ngModel)]="newReligionName" placeholder="New Religion Name..." class="form-control-sm" />
+          <button (click)="addReligionMaster()" class="btn-add-sm"><i class="bi bi-plus"></i> Add</button>
+        </div>
+        <div class="tag-cloud">
+          <span *ngFor="let r of religionsList" class="tag-pill">{{ r }}</span>
+        </div>
+      </div>
+
+      <!-- Mother Tongues Master -->
+      <div class="master-card">
+        <h3><i class="bi bi-translate"></i> Master Languages ({{ languagesList.length }})</h3>
+        <div class="add-inline-form">
+          <input type="text" [(ngModel)]="newLanguageName" placeholder="New Language..." class="form-control-sm" />
+          <button (click)="addLanguageMaster()" class="btn-add-sm"><i class="bi bi-plus"></i> Add</button>
+        </div>
+        <div class="tag-cloud">
+          <span *ngFor="let l of languagesList" class="tag-pill">{{ l }}</span>
+        </div>
+      </div>
+
+      <!-- Locations Master -->
+      <div class="master-card">
+        <h3><i class="bi bi-buildings"></i> Master Cities ({{ locationsList.length }})</h3>
+        <div class="add-inline-form">
+          <input type="text" [(ngModel)]="newCityName" placeholder="City (e.g. Surat)" class="form-control-sm" />
+          <input type="text" [(ngModel)]="newStateName" placeholder="State (e.g. Gujarat)" class="form-control-sm" />
+          <button (click)="addLocationMaster()" class="btn-add-sm"><i class="bi bi-plus"></i> Add</button>
+        </div>
+        <div class="tag-cloud">
+          <span *ngFor="let loc of locationsList" class="tag-pill">{{ loc }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: ADD SUCCESS STORY                                                  -->
+  <!-- ========================================================================= -->
+  <div *ngIf="showAddStoryModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="bi bi-heart-fill text-rose"></i> Publish New Success Story</h3>
+        <button class="btn-close-modal" (click)="closeAddStoryModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Couple Names *</label>
+          <input type="text" [(ngModel)]="newStory.coupleName" placeholder="e.g. Vikram & Radhika" class="form-control" />
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Wedding Date *</label>
+            <input type="text" [(ngModel)]="newStory.weddingDate" placeholder="e.g. February 2026" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label>Wedding Location *</label>
+            <input type="text" [(ngModel)]="newStory.location" placeholder="e.g. Jaipur, Rajasthan" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Couple Photo Image URL *</label>
+          <input type="text" [(ngModel)]="newStory.imageUrl" placeholder="https://images.unsplash.com/..." class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Couple Review Quote *</label>
+          <input type="text" [(ngModel)]="newStory.quote" placeholder="&quot;Found my soulmate on MilanSetu!&quot;" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label>Story Snippet & Journey</label>
+          <textarea [(ngModel)]="newStory.storySnippet" rows="3" placeholder="Tell their short story..." class="form-control"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeAddStoryModal()">Cancel</button>
+        <button class="btn-publish" (click)="saveStory()"><i class="bi bi-send-check"></i> Publish Story</button>
+      </div>
+    </div>
+  </div>
+</div>

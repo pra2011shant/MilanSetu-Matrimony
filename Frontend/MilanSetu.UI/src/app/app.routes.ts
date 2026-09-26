@@ -10,6 +10,7 @@ import { MatchesComponent } from './components/matches/matches.component';
 import { InterestsComponent } from './components/interests/interests.component';
 import { ShortlistComponent } from './components/shortlist/shortlist.component';
 import { ChatComponent } from './components/chat/chat.component';
+import { AdminComponent } from './components/admin/admin.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -26,6 +27,7 @@ export const routes: Routes = [
   { path: 'profile', redirectTo: 'my-profile', pathMatch: 'full' },
   { path: 'partner-preference', component: PartnerPreferenceComponent },
   { path: 'preference', redirectTo: 'partner-preference', pathMatch: 'full' },
+  { path: 'admin', component: AdminComponent },
   { path: '**', redirectTo: '' }
 ];
 
