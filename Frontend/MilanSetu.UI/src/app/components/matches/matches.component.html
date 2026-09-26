@@ -1,0 +1,357 @@
+<div class="matching-dashboard-page">
+  <!-- Top Match Engine Hero -->
+  <section class="matching-hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-text">
+          <span class="badge-gold"><i class="bi bi-cpu-fill"></i> MilanSetu Intelligent MatchEngine™</span>
+          <h1>Your Smart <span class="text-gold">Partner Matches</span></h1>
+          <p>
+            Curated automatically based on your <strong>Partner Preferences</strong>, astrology harmony, career aspirations, and lifestyle choices.
+          </p>
+          <div class="match-flow-pills">
+            <span class="flow-pill"><i class="bi bi-sliders"></i> Preferences</span>
+            <i class="bi bi-arrow-right flow-arrow"></i>
+            <span class="flow-pill"><i class="bi bi-funnel"></i> AI Filtering</span>
+            <i class="bi bi-arrow-right flow-arrow"></i>
+            <span class="flow-pill active"><i class="bi bi-percent"></i> Compatibility Score</span>
+            <i class="bi bi-arrow-right flow-arrow"></i>
+            <span class="flow-pill"><i class="bi bi-stars"></i> Top Recommendations</span>
+          </div>
+        </div>
+
+        <div class="hero-action-box">
+          <a routerLink="/partner-preference" class="btn btn-outline-white">
+            <i class="bi bi-sliders"></i> Edit Preferences
+          </a>
+          <a routerLink="/search" class="btn btn-gold">
+            <i class="bi bi-search"></i> Advanced Search
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Dashboard Content -->
+  <div class="container dashboard-container">
+    <!-- Stat Summary Metric Cards -->
+    <div class="metrics-grid" *ngIf="dashboardData">
+      <div class="metric-card active-card" (click)="setTab('recommended')">
+        <div class="metric-icon-wrap icon-gold">
+          <i class="bi bi-stars"></i>
+        </div>
+        <div class="metric-info">
+          <span class="metric-num">{{ dashboardData.recommendedMatches.length }}</span>
+          <span class="metric-label">Recommended Matches</span>
+        </div>
+      </div>
+
+      <div class="metric-card" [class.active-card]="activeTab === 'new'" (click)="setTab('new')">
+        <div class="metric-icon-wrap icon-rose">
+          <i class="bi bi-person-plus-fill"></i>
+        </div>
+        <div class="metric-info">
+          <span class="metric-num">{{ dashboardData.newMatches.length }}</span>
+          <span class="metric-label">New Matches</span>
+        </div>
+      </div>
+
+      <div class="metric-card" [class.active-card]="activeTab === 'nearMe'" (click)="setTab('nearMe')">
+        <div class="metric-icon-wrap icon-emerald">
+          <i class="bi bi-geo-alt-fill"></i>
+        </div>
+        <div class="metric-info">
+          <span class="metric-num">{{ dashboardData.nearMeMatches.length }}</span>
+          <span class="metric-label">Near Me</span>
+        </div>
+      </div>
+
+      <div class="metric-card" [class.active-card]="activeTab === 'visitors'" (click)="setTab('visitors')">
+        <div class="metric-icon-wrap icon-blue">
+          <i class="bi bi-eye-fill"></i>
+        </div>
+        <div class="metric-info">
+          <span class="metric-num">{{ dashboardData.profileVisitors.length }}</span>
+          <span class="metric-label">Profile Visitors</span>
+        </div>
+      </div>
+
+      <div class="metric-card" [class.active-card]="activeTab === 'shortlisted'" (click)="setTab('shortlisted')">
+        <div class="metric-icon-wrap icon-amber">
+          <i class="bi bi-star-fill"></i>
+        </div>
+        <div class="metric-info">
+          <span class="metric-num">{{ dashboardData.shortlistedMatches.length }}</span>
+          <span class="metric-label">Shortlisted</span>
+        </div>
+      </div>
+
+      <div class="metric-card" [class.active-card]="activeTab === 'recent'" (click)="setTab('recent')">
+        <div class="metric-icon-wrap icon-purple">
+          <i class="bi bi-clock-history"></i>
+        </div>
+        <div class="metric-info">
+          <span class="metric-num">{{ dashboardData.recentlyViewed.length }}</span>
+          <span class="metric-label">Recently Viewed</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-nav-bar">
+      <button class="tab-btn" [class.active]="activeTab === 'recommended'" (click)="setTab('recommended')">
+        <i class="bi bi-stars"></i> Recommended Matches ({{ dashboardData?.recommendedMatches?.length || 0 }})
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'new'" (click)="setTab('new')">
+        <i class="bi bi-sparkles"></i> New Matches ({{ dashboardData?.newMatches?.length || 0 }})
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'nearMe'" (click)="setTab('nearMe')">
+        <i class="bi bi-geo-alt"></i> Near Me ({{ dashboardData?.nearMeMatches?.length || 0 }})
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'visitors'" (click)="setTab('visitors')">
+        <i class="bi bi-eye"></i> Profile Visitors ({{ dashboardData?.profileVisitors?.length || 0 }})
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'shortlisted'" (click)="setTab('shortlisted')">
+        <i class="bi bi-star"></i> Shortlisted ({{ dashboardData?.shortlistedMatches?.length || 0 }})
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'recent'" (click)="setTab('recent')">
+        <i class="bi bi-clock-history"></i> Recently Viewed
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Analyzing compatibility algorithms and matching preferences...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && getActiveProfiles().length === 0">
+      <div class="empty-icon"><i class="bi bi-search-heart"></i></div>
+      <h3>No matches found in this category</h3>
+      <p>Try adjusting your Partner Preferences or expand your search filters to view more profiles.</p>
+      <div class="d-flex gap-3 justify-center mt-3">
+        <a routerLink="/partner-preference" class="btn btn-primary"><i class="bi bi-sliders"></i> Edit Preferences</a>
+        <a routerLink="/search" class="btn btn-outline"><i class="bi bi-search"></i> Advanced Search</a>
+      </div>
+    </div>
+
+    <!-- Profiles Grid -->
+    <div class="matches-grid" *ngIf="!isLoading && getActiveProfiles().length > 0">
+      <div class="match-card" *ngFor="let profile of getActiveProfiles()" (click)="openProfileDetails(profile)">
+        <!-- Photo & Badges -->
+        <div class="match-image-wrap">
+          <img [src]="profile.imageUrl" [alt]="profile.name" loading="lazy" />
+          <div class="photo-overlay"></div>
+
+          <!-- Compatibility Score Pill -->
+          <div class="score-badge" [ngClass]="{'score-high': profile.matchScore >= 90, 'score-med': profile.matchScore < 90 && profile.matchScore >= 75}">
+            <i class="bi bi-heart-fill"></i> {{ profile.matchScore }}% Match
+          </div>
+
+          <!-- Shortlist Star Button -->
+          <button class="btn-shortlist-float" [class.shortlisted]="profile.isShortlisted" (click)="toggleShortlist(profile, $event)" title="Shortlist Profile">
+            <i class="bi" [ngClass]="profile.isShortlisted ? 'bi-star-fill' : 'bi-star'"></i>
+          </button>
+
+          <!-- Verified & Premium Badges -->
+          <div class="image-badges">
+            <span class="badge-verified" *ngIf="profile.verified"><i class="bi bi-patch-check-fill"></i> Verified</span>
+            <span class="badge-prem" *ngIf="profile.premium"><i class="bi bi-gem"></i> Premium</span>
+          </div>
+        </div>
+
+        <!-- Profile Body -->
+        <div class="match-body">
+          <div class="match-header">
+            <div>
+              <h3 class="match-name">{{ profile.name }}</h3>
+              <span class="match-pid">{{ profile.profileId }} • {{ profile.age }} Yrs, {{ profile.height }}</span>
+            </div>
+          </div>
+
+          <!-- Quick Info Pills -->
+          <div class="match-details-list">
+            <div class="detail-row">
+              <i class="bi bi-person-check text-rose"></i>
+              <span>{{ profile.maritalStatus }} • {{ profile.religion }} ({{ profile.caste }})</span>
+            </div>
+            <div class="detail-row">
+              <i class="bi bi-translate text-gold"></i>
+              <span>{{ profile.motherTongue }}</span>
+            </div>
+            <div class="detail-row">
+              <i class="bi bi-mortarboard text-emerald"></i>
+              <span>{{ profile.education }}</span>
+            </div>
+            <div class="detail-row">
+              <i class="bi bi-briefcase text-blue"></i>
+              <span>{{ profile.profession }} <span *ngIf="profile.company">at {{ profile.company }}</span></span>
+            </div>
+            <div class="detail-row">
+              <i class="bi bi-cash-stack text-amber"></i>
+              <span>{{ profile.annualIncome }}</span>
+            </div>
+            <div class="detail-row">
+              <i class="bi bi-geo-alt-fill text-rose"></i>
+              <span>{{ profile.location }}</span>
+            </div>
+          </div>
+
+          <!-- Compatibility Bar & Breakdown trigger -->
+          <div class="match-score-bar-wrap" (click)="openMatchScoreModal(profile, $event)">
+            <div class="score-bar-header">
+              <span class="score-summary-text">{{ profile.matchSummary }}</span>
+              <span class="score-breakdown-link"><i class="bi bi-info-circle"></i> Breakdown</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" [style.width.%]="profile.matchScore" [ngClass]="{'fill-green': profile.matchScore >= 90, 'fill-gold': profile.matchScore < 90}"></div>
+            </div>
+          </div>
+
+          <!-- About preview -->
+          <p class="about-snippet" *ngIf="profile.about">
+            "{{ profile.about | slice:0:90 }}..."
+          </p>
+
+          <!-- Card Actions -->
+          <div class="card-actions">
+            <button class="btn btn-interest" [class.btn-sent]="profile.interestStatus === 'Pending'" (click)="sendInterest(profile, $event)">
+              <i class="bi" [ngClass]="profile.interestStatus === 'Pending' ? 'bi-check2-circle' : 'bi-heart-fill'"></i>
+              <span>{{ profile.interestStatus === 'Pending' ? 'Interest Sent' : 'Send Interest' }}</span>
+            </button>
+
+            <button class="btn btn-view-profile" (click)="openProfileDetails(profile)">
+              <i class="bi bi-person-lines-fill"></i> View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATCH SCORE BREAKDOWN MODAL -->
+  <div class="modal-backdrop" *ngIf="selectedScoreProfile" (click)="closeMatchScoreModal()">
+    <div class="modal-card score-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <h3>Compatibility Breakdown</h3>
+          <p class="modal-subtitle">Matching score between You and <strong>{{ selectedScoreProfile.name }}</strong></p>
+        </div>
+        <button class="btn-close-modal" (click)="closeMatchScoreModal()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="score-modal-body">
+        <div class="score-circle-display">
+          <div class="big-score-ring">
+            <span class="big-score-num">{{ selectedScoreProfile.matchScore }}%</span>
+            <span class="big-score-sub">Compatibility</span>
+          </div>
+          <div class="score-circle-info">
+            <span class="badge-status">{{ selectedScoreProfile.matchBadge }}</span>
+            <h4>{{ selectedScoreProfile.matchSummary }}</h4>
+            <p>Based on your Partner Preferences set on MilanSetu.</p>
+          </div>
+        </div>
+
+        <div class="criteria-list">
+          <div class="criteria-item" *ngFor="let item of selectedScoreProfile.matchCriteriaList">
+            <div class="criteria-status">
+              <i class="bi" [ngClass]="item.icon"></i>
+            </div>
+            <div class="criteria-text">
+              <div class="criteria-title">{{ item.title }}</div>
+              <div class="criteria-desc">{{ item.description }}</div>
+            </div>
+            <div class="criteria-badge" [class.badge-pass]="item.isMatch" [class.badge-partial]="!item.isMatch">
+              {{ item.isMatch ? 'Match' : 'Partial' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="closeMatchScoreModal()">Close</button>
+        <button class="btn btn-primary" (click)="sendInterest(selectedScoreProfile, $event); closeMatchScoreModal()">
+          <i class="bi bi-heart-fill"></i> Connect with {{ selectedScoreProfile.name }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL PROFILE DETAIL MODAL -->
+  <div class="modal-backdrop" *ngIf="selectedProfileForModal" (click)="closeProfileDetails()">
+    <div class="modal-card profile-detail-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="d-flex items-center gap-3">
+          <img [src]="selectedProfileForModal.imageUrl" class="modal-avatar" alt="Avatar" />
+          <div>
+            <h3>{{ selectedProfileForModal.name }} <i class="bi bi-patch-check-fill text-primary" *ngIf="selectedProfileForModal.verified"></i></h3>
+            <span class="modal-subtitle">{{ selectedProfileForModal.profileId }} • {{ selectedProfileForModal.age }} Yrs, {{ selectedProfileForModal.height }} • {{ selectedProfileForModal.location }}</span>
+          </div>
+        </div>
+        <button class="btn-close-modal" (click)="closeProfileDetails()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="modal-body-content">
+        <!-- Compatibility Highlight in Profile -->
+        <div class="profile-compat-highlight">
+          <div class="d-flex items-center justify-between">
+            <div class="d-flex items-center gap-2">
+              <span class="score-badge score-high"><i class="bi bi-heart-fill"></i> {{ selectedProfileForModal.matchScore }}% Compatible</span>
+              <span class="font-bold">{{ selectedProfileForModal.matchSummary }}</span>
+            </div>
+            <a routerLink="/partner-preference" (click)="closeProfileDetails()" class="text-primary text-sm font-semibold">Change Preference</a>
+          </div>
+        </div>
+
+        <div class="profile-sections-grid">
+          <div class="section-card">
+            <h4><i class="bi bi-person-lines-fill text-rose"></i> Basic & Religion</h4>
+            <div class="spec-grid">
+              <div class="spec-item"><span class="spec-label">Marital Status:</span> <span class="spec-val">{{ selectedProfileForModal.maritalStatus }}</span></div>
+              <div class="spec-item"><span class="spec-label">Religion:</span> <span class="spec-val">{{ selectedProfileForModal.religion }}</span></div>
+              <div class="spec-item"><span class="spec-label">Caste/Community:</span> <span class="spec-val">{{ selectedProfileForModal.caste }}</span></div>
+              <div class="spec-item"><span class="spec-label">Mother Tongue:</span> <span class="spec-val">{{ selectedProfileForModal.motherTongue }}</span></div>
+              <div class="spec-item"><span class="spec-label">City:</span> <span class="spec-val">{{ selectedProfileForModal.city }}</span></div>
+              <div class="spec-item"><span class="spec-label">State/Country:</span> <span class="spec-val">{{ selectedProfileForModal.state }}, India</span></div>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <h4><i class="bi bi-mortarboard-fill text-emerald"></i> Education & Career</h4>
+            <div class="spec-grid">
+              <div class="spec-item"><span class="spec-label">Highest Degree:</span> <span class="spec-val">{{ selectedProfileForModal.education }}</span></div>
+              <div class="spec-item"><span class="spec-label">Profession:</span> <span class="spec-val">{{ selectedProfileForModal.profession }}</span></div>
+              <div class="spec-item"><span class="spec-label">Working At:</span> <span class="spec-val">{{ selectedProfileForModal.company || 'Top Organization' }}</span></div>
+              <div class="spec-item"><span class="spec-label">Annual Income:</span> <span class="spec-val text-gold font-bold">{{ selectedProfileForModal.annualIncome }}</span></div>
+            </div>
+          </div>
+
+          <div class="section-card full-span">
+            <h4><i class="bi bi-quote text-gold"></i> About Me</h4>
+            <p class="about-text-full">{{ selectedProfileForModal.about }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="toggleShortlist(selectedProfileForModal, $event)">
+          <i class="bi" [ngClass]="selectedProfileForModal.isShortlisted ? 'bi-star-fill text-amber' : 'bi-star'"></i>
+          <span>{{ selectedProfileForModal.isShortlisted ? 'Shortlisted' : 'Shortlist' }}</span>
+        </button>
+
+        <button class="btn btn-primary" [class.btn-sent]="selectedProfileForModal.interestStatus === 'Pending'" (click)="sendInterest(selectedProfileForModal, $event)">
+          <i class="bi" [ngClass]="selectedProfileForModal.interestStatus === 'Pending' ? 'bi-check2-circle' : 'bi-heart-fill'"></i>
+          <span>{{ selectedProfileForModal.interestStatus === 'Pending' ? 'Interest Sent' : 'Send Express Interest' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-popup" *ngIf="toastMessage">
+    <i class="bi bi-check-circle-fill text-gold"></i>
+    <span>{{ toastMessage }}</span>
+  </div>
+</div>

@@ -13,8 +13,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// 2. Add JWT Authentication Service
+// 2. Add JWT Authentication Service & Domain Services
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IMatchingService, MatchingService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "MilanSetuSuperSecretKeyForMatrimonialPortalJwtTokenAuthentication2026";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "MilanSetu.API";

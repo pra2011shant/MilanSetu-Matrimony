@@ -14,6 +14,9 @@ namespace MilanSetu.API.Data
         public DbSet<PasswordResetOtp> PasswordResetOtps { get; set; } = null!;
         public DbSet<UserProfile> UserProfiles { get; set; } = null!;
         public DbSet<PartnerPreference> PartnerPreferences { get; set; } = null!;
+        public DbSet<ProfileView> ProfileViews { get; set; } = null!;
+        public DbSet<UserShortlist> UserShortlists { get; set; } = null!;
+        public DbSet<UserInterest> UserInterests { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -23,6 +26,45 @@ namespace MilanSetu.API.Data
             {
                 entity.HasIndex(u => u.Email).IsUnique();
                 entity.HasIndex(u => u.Mobile).IsUnique();
+            });
+
+            modelBuilder.Entity<ProfileView>(entity =>
+            {
+                entity.HasOne(pv => pv.ViewerUser)
+                      .WithMany()
+                      .HasForeignKey(pv => pv.ViewerUserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(pv => pv.ViewedUser)
+                      .WithMany()
+                      .HasForeignKey(pv => pv.ViewedUserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<UserShortlist>(entity =>
+            {
+                entity.HasOne(us => us.User)
+                      .WithMany()
+                      .HasForeignKey(us => us.UserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(us => us.ShortlistedUser)
+                      .WithMany()
+                      .HasForeignKey(us => us.ShortlistedUserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<UserInterest>(entity =>
+            {
+                entity.HasOne(ui => ui.SenderUser)
+                      .WithMany()
+                      .HasForeignKey(ui => ui.SenderUserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(ui => ui.ReceiverUser)
+                      .WithMany()
+                      .HasForeignKey(ui => ui.ReceiverUserId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }
