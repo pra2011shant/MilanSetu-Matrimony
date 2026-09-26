@@ -52,6 +52,9 @@ namespace MilanSetu.API.Models
 
         public bool IsVerified { get; set; } = true;
 
+        [MaxLength(10)]
+        public string PreferredLanguage { get; set; } = "en";
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public virtual ICollection<UserProfile> UserProfiles { get; set; } = new List<UserProfile>();

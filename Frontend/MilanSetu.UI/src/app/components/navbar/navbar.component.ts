@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService, AppNotification } from '../../services/notification.service';
+import { TranslationService, LanguageOption } from '../../services/translation.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslatePipe],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
@@ -15,11 +17,13 @@ export class NavbarComponent implements OnInit {
   isMenuOpen = false;
   isScrolled = false;
   isNotificationsOpen = false;
+  isLangDropdownOpen = false;
   notifications: AppNotification[] = [];
 
   constructor(
     public authService: AuthService,
-    public notifService: NotificationService
+    public notifService: NotificationService,
+    public transService: TranslationService
   ) {}
 
   ngOnInit(): void {
@@ -49,6 +53,15 @@ export class NavbarComponent implements OnInit {
         this.notifications.forEach(n => { n.isRead = true; });
       }
     });
+  }
+
+  toggleLangDropdown(): void {
+    this.isLangDropdownOpen = !this.isLangDropdownOpen;
+  }
+
+  selectLanguage(code: string): void {
+    this.transService.setLanguage(code);
+    this.isLangDropdownOpen = false;
   }
 
   toggleMenu() {

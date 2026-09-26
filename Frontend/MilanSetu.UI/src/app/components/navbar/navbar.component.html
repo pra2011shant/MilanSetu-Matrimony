@@ -6,9 +6,31 @@
         <span>Register Free & Explore 100% Verified Profiles Today!</span>
       </div>
       <div class="top-contact">
+        <!-- Language Switcher in Top Bar -->
+        <div class="lang-dropdown-wrapper">
+          <button class="btn-lang-toggle" (click)="toggleLangDropdown()">
+            <span>{{ transService.currentLanguageOption.flag }} {{ transService.currentLanguageOption.nativeName }}</span>
+            <i class="bi bi-chevron-down"></i>
+          </button>
+
+          <div class="lang-menu" *ngIf="isLangDropdownOpen">
+            <button
+              class="lang-option"
+              *ngFor="let l of transService.supportedLanguages"
+              [class.selected]="l.code === transService.currentLanguage"
+              (click)="selectLanguage(l.code)"
+            >
+              <span class="lang-flag">{{ l.flag }}</span>
+              <span class="lang-native">{{ l.nativeName }}</span>
+              <span class="lang-en">({{ l.name }})</span>
+            </button>
+          </div>
+        </div>
+
+        <span class="divider">|</span>
         <span><i class="bi bi-telephone-fill"></i> +91 98765 43210</span>
         <span class="divider">|</span>
-        <span><i class="bi bi-shield-check"></i> 100% Verified Profiles</span>
+        <span><i class="bi bi-shield-check"></i> {{ 'common.verified' | translate }}</span>
       </div>
     </div>
   </div>
@@ -28,14 +50,14 @@
 
       <!-- Desktop Nav Menu -->
       <ul class="nav-links">
-        <li><a routerLink="/" class="active"><i class="bi bi-house-door"></i> Home</a></li>
-        <li><a routerLink="/matches"><i class="bi bi-stars text-gold"></i> Matches</a></li>
-        <li><a routerLink="/interests"><i class="bi bi-heart-pulse-fill text-rose"></i> Interests</a></li>
-        <li><a routerLink="/chat"><i class="bi bi-chat-dots-fill text-blue"></i> Chat</a></li>
-        <li><a routerLink="/shortlist"><i class="bi bi-star-fill text-amber"></i> Shortlist</a></li>
-        <li><a routerLink="/search"><i class="bi bi-search-heart"></i> Search</a></li>
-        <li><a routerLink="/partner-preference"><i class="bi bi-sliders text-primary"></i> Preferences</a></li>
-        <li><a routerLink="/my-profile"><i class="bi bi-person-circle"></i> Profile</a></li>
+        <li><a routerLink="/" class="active"><i class="bi bi-house-door"></i> {{ 'nav.home' | translate }}</a></li>
+        <li><a routerLink="/matches"><i class="bi bi-stars text-gold"></i> {{ 'nav.matches' | translate }}</a></li>
+        <li><a routerLink="/interests"><i class="bi bi-heart-pulse-fill text-rose"></i> {{ 'nav.interests' | translate }}</a></li>
+        <li><a routerLink="/chat"><i class="bi bi-chat-dots-fill text-blue"></i> {{ 'nav.chat' | translate }}</a></li>
+        <li><a routerLink="/shortlist"><i class="bi bi-star-fill text-amber"></i> {{ 'nav.shortlist' | translate }}</a></li>
+        <li><a routerLink="/search"><i class="bi bi-search-heart"></i> {{ 'nav.search' | translate }}</a></li>
+        <li><a routerLink="/partner-preference"><i class="bi bi-sliders text-primary"></i> {{ 'nav.preferences' | translate }}</a></li>
+        <li><a routerLink="/my-profile"><i class="bi bi-person-circle"></i> {{ 'nav.profile' | translate }}</a></li>
       </ul>
 
       <!-- Notification Bell -->
@@ -72,10 +94,10 @@
       <!-- Auth Action Buttons (Dynamic based on login status) -->
       <div class="nav-actions" *ngIf="!(authService.currentUser$ | async); else loggedInTpl">
         <a routerLink="/login" class="btn btn-outline">
-          <i class="bi bi-box-arrow-in-right"></i> Login
+          <i class="bi bi-box-arrow-in-right"></i> {{ 'nav.login' | translate }}
         </a>
         <a routerLink="/register" class="btn btn-primary btn-glow">
-          <i class="bi bi-person-plus-fill"></i> Register Free
+          <i class="bi bi-person-plus-fill"></i> {{ 'nav.registerFree' | translate }}
         </a>
       </div>
 
@@ -86,7 +108,7 @@
             <span class="user-nav-name">{{ user.name }}</span>
           </a>
           <button (click)="logout()" class="btn btn-outline btn-sm">
-            <i class="bi bi-box-arrow-right"></i> Logout
+            <i class="bi bi-box-arrow-right"></i> {{ 'nav.logout' | translate }}
           </button>
         </div>
       </ng-template>
@@ -99,28 +121,43 @@
 
     <!-- Mobile Nav Drawer -->
     <div class="mobile-menu" [class.open]="isMenuOpen">
+      <!-- Mobile Language Selector -->
+      <div class="mobile-lang-box mb-3">
+        <span class="text-sm font-bold text-muted mb-2 d-block">🌐 Select Language:</span>
+        <div class="d-flex flex-wrap gap-2">
+          <button
+            class="sub-pill"
+            *ngFor="let l of transService.supportedLanguages"
+            [class.active]="l.code === transService.currentLanguage"
+            (click)="selectLanguage(l.code)"
+          >
+            {{ l.flag }} {{ l.nativeName }}
+          </button>
+        </div>
+      </div>
+
       <ul class="mobile-nav-links">
-        <li><a routerLink="/" (click)="toggleMenu()"><i class="bi bi-house-door"></i> Home</a></li>
-        <li><a routerLink="/matches" (click)="toggleMenu()"><i class="bi bi-stars text-gold"></i> Matches</a></li>
-        <li><a routerLink="/interests" (click)="toggleMenu()"><i class="bi bi-heart-pulse-fill text-rose"></i> Interests</a></li>
-        <li><a routerLink="/chat" (click)="toggleMenu()"><i class="bi bi-chat-dots-fill text-blue"></i> Chat Messages</a></li>
-        <li><a routerLink="/shortlist" (click)="toggleMenu()"><i class="bi bi-star-fill text-amber"></i> Saved Shortlist</a></li>
-        <li><a routerLink="/search" (click)="toggleMenu()"><i class="bi bi-search-heart"></i> Search Matches</a></li>
-        <li><a routerLink="/partner-preference" (click)="toggleMenu()"><i class="bi bi-sliders text-primary"></i> Partner Preference</a></li>
-        <li><a routerLink="/my-profile" (click)="toggleMenu()"><i class="bi bi-person-circle"></i> My Profile</a></li>
-        <li><a routerLink="/register" (click)="toggleMenu()"><i class="bi bi-person-plus"></i> Register</a></li>
+        <li><a routerLink="/" (click)="toggleMenu()"><i class="bi bi-house-door"></i> {{ 'nav.home' | translate }}</a></li>
+        <li><a routerLink="/matches" (click)="toggleMenu()"><i class="bi bi-stars text-gold"></i> {{ 'nav.matches' | translate }}</a></li>
+        <li><a routerLink="/interests" (click)="toggleMenu()"><i class="bi bi-heart-pulse-fill text-rose"></i> {{ 'nav.interests' | translate }}</a></li>
+        <li><a routerLink="/chat" (click)="toggleMenu()"><i class="bi bi-chat-dots-fill text-blue"></i> {{ 'nav.chat' | translate }}</a></li>
+        <li><a routerLink="/shortlist" (click)="toggleMenu()"><i class="bi bi-star-fill text-amber"></i> {{ 'nav.shortlist' | translate }}</a></li>
+        <li><a routerLink="/search" (click)="toggleMenu()"><i class="bi bi-search-heart"></i> {{ 'nav.search' | translate }}</a></li>
+        <li><a routerLink="/partner-preference" (click)="toggleMenu()"><i class="bi bi-sliders text-primary"></i> {{ 'nav.preferences' | translate }}</a></li>
+        <li><a routerLink="/my-profile" (click)="toggleMenu()"><i class="bi bi-person-circle"></i> {{ 'nav.profile' | translate }}</a></li>
+        <li><a routerLink="/register" (click)="toggleMenu()"><i class="bi bi-person-plus"></i> {{ 'nav.registerFree' | translate }}</a></li>
       </ul>
       <div class="mobile-actions" *ngIf="!(authService.currentUser$ | async); else mobileLoggedInTpl">
         <a routerLink="/login" (click)="toggleMenu()" class="btn btn-outline w-100 mb-2"><i
-            class="bi bi-box-arrow-in-right"></i> Login</a>
+            class="bi bi-box-arrow-in-right"></i> {{ 'nav.login' | translate }}</a>
         <a routerLink="/register" (click)="toggleMenu()" class="btn btn-primary w-100"><i
-            class="bi bi-person-plus-fill"></i> Register Free</a>
+            class="bi bi-person-plus-fill"></i> {{ 'nav.registerFree' | translate }}</a>
       </div>
       <ng-template #mobileLoggedInTpl>
         <div class="mobile-actions" *ngIf="authService.currentUser$ | async as user">
           <p class="mb-2 font-bold"><i class="bi bi-person-circle"></i> Logged in as: {{ user.name }}</p>
           <button (click)="logout(); toggleMenu()" class="btn btn-outline w-100"><i class="bi bi-box-arrow-right"></i>
-            Logout</button>
+            {{ 'nav.logout' | translate }}</button>
         </div>
       </ng-template>
     </div>

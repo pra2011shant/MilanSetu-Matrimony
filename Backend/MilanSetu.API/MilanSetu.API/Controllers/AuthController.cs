@@ -270,6 +270,28 @@ namespace MilanSetu.API.Controllers
         }
 
         [Authorize]
+        [HttpPut("language")]
+        public async Task<IActionResult> UpdateLanguage([FromBody] UpdateLanguageDto dto)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found." });
+            }
+
+            user.PreferredLanguage = dto.Language.Trim().ToLower();
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, language = user.PreferredLanguage, message = "Language preference saved successfully." });
+        }
+
+        [Authorize]
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUser()
         {
@@ -302,6 +324,7 @@ namespace MilanSetu.API.Controllers
                 Location = user.Location,
                 ProfilePhotoUrl = user.ProfilePhotoUrl,
                 IsVerified = user.IsVerified,
+                PreferredLanguage = user.PreferredLanguage,
                 CreatedAt = user.CreatedAt
             });
         }

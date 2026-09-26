@@ -101,6 +101,14 @@ namespace MilanSetu.API.DTOs
         public string Location { get; set; } = string.Empty;
         public string? ProfilePhotoUrl { get; set; }
         public bool IsVerified { get; set; }
+        public string PreferredLanguage { get; set; } = "en";
         public DateTime CreatedAt { get; set; }
+    }
+
+    public class UpdateLanguageDto
+    {
+        [Required]
+        [MaxLength(10)]
+        public string Language { get; set; } = "en";
     }
 }

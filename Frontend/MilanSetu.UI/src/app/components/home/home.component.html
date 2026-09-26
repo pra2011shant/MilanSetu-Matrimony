@@ -9,37 +9,37 @@
       <div class="hero-content">
         <div class="hero-badge">
           <i class="bi bi-patch-check-fill text-gold"></i>
-          <span>India's Most Trusted Sacred Matchmaking Portal</span>
+          <span>{{ 'hero.badge' | translate }}</span>
         </div>
         <h1 class="hero-title">
-          Connecting <span class="gradient-text">Hearts</span>, Bridging <span class="gradient-text">Souls</span> For A Lifetime
+          {{ 'hero.titlePart1' | translate }} <span class="gradient-text">{{ 'hero.titleHighlight' | translate }}</span>
         </h1>
         <p class="hero-subtitle">
-          Discover compatible, authentic life partners from verified families across India & worldwide with highest privacy standards.
+          {{ 'hero.subtitle' | translate }}
         </p>
 
         <!-- Floating Quick Search Box -->
         <div id="search" class="search-box-card">
           <div class="search-card-header">
             <span class="search-header-title">
-              <i class="bi bi-search-heart text-primary"></i> Quick Partner Search
+              <i class="bi bi-search-heart text-primary"></i> {{ 'hero.searchBtn' | translate }}
             </span>
-            <span class="search-sub-tag">100% Free Search</span>
+            <span class="search-sub-tag">{{ 'common.verified' | translate }}</span>
           </div>
 
           <form class="search-form-grid" (ngSubmit)="onSearch()">
             <!-- 1. I'm looking for -->
             <div class="form-group">
-              <label class="form-label"><i class="bi bi-person-heart"></i> I'm looking for</label>
+              <label class="form-label"><i class="bi bi-person-heart"></i> {{ 'hero.lookingFor' | translate }}</label>
               <select [(ngModel)]="searchCriteria.lookingFor" name="lookingFor" class="form-control">
-                <option value="Bride">A Bride (Woman)</option>
-                <option value="Groom">A Groom (Man)</option>
+                <option value="Bride">{{ 'hero.bride' | translate }}</option>
+                <option value="Groom">{{ 'hero.groom' | translate }}</option>
               </select>
             </div>
 
             <!-- 2. Age Range -->
             <div class="form-group">
-              <label class="form-label"><i class="bi bi-calendar3"></i> Age Range</label>
+              <label class="form-label"><i class="bi bi-calendar3"></i> {{ 'hero.age' | translate }}</label>
               <div class="age-range-inputs">
                 <select [(ngModel)]="searchCriteria.minAge" name="minAge" class="form-control range-select">
                   <option *ngFor="let age of ageOptions" [value]="age">{{ age }} Yrs</option>
@@ -53,7 +53,7 @@
 
             <!-- 3. Religion -->
             <div class="form-group">
-              <label class="form-label"><i class="bi bi-star"></i> Religion</label>
+              <label class="form-label"><i class="bi bi-star"></i> {{ 'hero.religion' | translate }}</label>
               <select [(ngModel)]="searchCriteria.religion" name="religion" class="form-control">
                 <option *ngFor="let rel of religions" [value]="rel">{{ rel }}</option>
               </select>
@@ -61,7 +61,7 @@
 
             <!-- 4. Mother Tongue -->
             <div class="form-group">
-              <label class="form-label"><i class="bi bi-translate"></i> Mother Tongue</label>
+              <label class="form-label"><i class="bi bi-translate"></i> {{ 'hero.motherTongue' | translate }}</label>
               <select [(ngModel)]="searchCriteria.motherTongue" name="motherTongue" class="form-control">
                 <option *ngFor="let lang of motherTongues" [value]="lang">{{ lang }}</option>
               </select>
@@ -70,7 +70,7 @@
             <!-- 5. Search Button -->
             <div class="form-group button-group">
               <button type="submit" class="btn btn-search">
-                <i class="bi bi-search"></i> Let's Search
+                <i class="bi bi-search"></i> {{ 'hero.searchBtn' | translate }}
               </button>
             </div>
           </form>
