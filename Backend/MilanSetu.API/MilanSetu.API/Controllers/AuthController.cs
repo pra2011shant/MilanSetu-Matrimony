@@ -18,11 +18,13 @@ namespace MilanSetu.API.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IJwtService _jwtService;
+        private readonly IEmailService _emailService;
 
-        public AuthController(ApplicationDbContext context, IJwtService jwtService)
+        public AuthController(ApplicationDbContext context, IJwtService jwtService, IEmailService emailService)
         {
             _context = context;
             _jwtService = jwtService;
+            _emailService = emailService;
         }
 
         [HttpPost("register")]
@@ -197,12 +199,117 @@ namespace MilanSetu.API.Controllers
             _context.PasswordResetOtps.Add(resetOtp);
             await _context.SaveChangesAsync();
 
+            // Send Real HTML Email with OTP
+            if (!string.IsNullOrEmpty(user.Email) && user.Email.Contains("@"))
+            {
+                await _emailService.SendOtpEmailAsync(user.Email, user.Name, otp);
+            }
+
             return Ok(new
             {
-                message = $"Verification OTP has been sent successfully to your registered { (identifier.Contains("@") ? "email" : "mobile") }.",
+                message = $"Verification OTP has been sent successfully to your registered email ({user.Email}).",
                 identifier = identifier,
-                otpPreview = otp, // Included for seamless testing & quick verification
+                otpPreview = otp, // Also returned for immediate local testing & evaluation
                 expiresInMinutes = 10
+            });
+        }
+
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDto dto)
+        {
+            if (!ModelState.IsValid || string.IsNullOrEmpty(dto.Email))
+            {
+                return BadRequest(new { message = "Invalid Google account data provided." });
+            }
+
+            var email = dto.Email.Trim().ToLower();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email);
+            bool isNewUser = false;
+
+            if (user == null)
+            {
+                isNewUser = true;
+                // Create user from Google OAuth profile
+                var defaultAvatar = !string.IsNullOrEmpty(dto.PhotoUrl) 
+                    ? dto.PhotoUrl 
+                    : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80";
+
+                user = new User
+                {
+                    Name = dto.Name.Trim(),
+                    Email = email,
+                    Mobile = "9" + new Random().Next(100000000, 999999999).ToString(), // Temporary mobile placeholder
+                    Gender = "Male", // Default, user can update in profile
+                    DateOfBirth = new DateTime(1998, 1, 1),
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString()),
+                    Religion = "Hindu",
+                    MotherTongue = "Hindi",
+                    Location = "Mumbai, Maharashtra",
+                    ProfilePhotoUrl = defaultAvatar,
+                    IsVerified = true,
+                    PreferredLanguage = "en",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                // Initialize default profile
+                var userProfile = new UserProfile
+                {
+                    UserId = user.Id,
+                    City = "Mumbai",
+                    State = "Maharashtra",
+                    Country = "India",
+                    ProfileCompletionPercentage = 75,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.UserProfiles.Add(userProfile);
+
+                // Initialize partner preference
+                var preference = new PartnerPreference
+                {
+                    UserId = user.Id,
+                    Religion = "Any Religion",
+                    MotherTongue = "Any Language",
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.PartnerPreferences.Add(preference);
+
+                await _context.SaveChangesAsync();
+
+                // Send Welcome Email
+                await _emailService.SendWelcomeEmailAsync(user.Email, user.Name);
+            }
+
+            var token = _jwtService.GenerateToken(user);
+            var age = CalculateAge(user.DateOfBirth);
+
+            var userResponse = new UserResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Gender = user.Gender,
+                DateOfBirth = user.DateOfBirth,
+                Age = age,
+                Email = user.Email,
+                Mobile = user.Mobile,
+                Religion = user.Religion,
+                Caste = user.Caste,
+                MotherTongue = user.MotherTongue,
+                Location = user.Location,
+                ProfilePhotoUrl = user.ProfilePhotoUrl,
+                IsVerified = user.IsVerified,
+                PreferredLanguage = user.PreferredLanguage,
+                CreatedAt = user.CreatedAt
+            };
+
+            return Ok(new AuthResponseDto
+            {
+                Token = token,
+                ExpiresAt = DateTime.UtcNow.AddMinutes(1440),
+                Message = isNewUser ? "Google account registered successfully! Welcome to MilanSetu." : "Google Login successful! Welcome back.",
+                User = userResponse
             });
         }
 

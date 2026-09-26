@@ -76,6 +76,16 @@ export class AuthService {
     );
   }
 
+  googleLogin(googleData: { email: string; name: string; photoUrl?: string; googleId?: string; token?: string }): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/google-login`, googleData).pipe(
+      tap((res) => {
+        if (res && res.token) {
+          this.setSession(res);
+        }
+      })
+    );
+  }
+
   forgotPassword(identifier: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/forgot-password`, { identifier });
   }

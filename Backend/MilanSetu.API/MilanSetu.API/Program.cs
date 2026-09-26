@@ -16,6 +16,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // 2. Add JWT Authentication Service & Domain Services
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IMatchingService, MatchingService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "MilanSetuSuperSecretKeyForMatrimonialPortalJwtTokenAuthentication2026";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "MilanSetu.API";

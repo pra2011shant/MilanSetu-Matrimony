@@ -111,4 +111,19 @@ namespace MilanSetu.API.DTOs
         [MaxLength(10)]
         public string Language { get; set; } = "en";
     }
+
+    public class GoogleLoginDto
+    {
+        [Required]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        public string Name { get; set; } = string.Empty;
+
+        public string? PhotoUrl { get; set; }
+
+        public string? GoogleId { get; set; }
+
+        public string? Token { get; set; }
+    }
 }

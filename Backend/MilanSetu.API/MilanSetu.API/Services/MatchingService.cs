@@ -12,10 +12,12 @@ namespace MilanSetu.API.Services
     public class MatchingService : IMatchingService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IEmailService _emailService;
 
-        public MatchingService(ApplicationDbContext context)
+        public MatchingService(ApplicationDbContext context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         public async Task<DashboardMatchesDto> GetDashboardMatchesAsync(int currentUserId)
@@ -325,12 +327,41 @@ namespace MilanSetu.API.Services
         {
             if (currentUserId == targetUserId) return false;
 
+            // 1. Record Profile View in Database
             _context.ProfileViews.Add(new ProfileView
             {
                 ViewerUserId = currentUserId,
                 ViewedUserId = targetUserId,
                 ViewedAt = DateTime.UtcNow
             });
+
+            // 2. Fetch Viewer and Target User details
+            var viewer = await _context.Users.FindAsync(currentUserId);
+            var targetUser = await _context.Users.FindAsync(targetUserId);
+
+            if (viewer != null && targetUser != null)
+            {
+                // 3. Create In-App Notification with Viewer ID
+                var notification = new Notification
+                {
+                    UserId = targetUserId,
+                    Type = "ProfileView",
+                    Title = "Profile Viewed! 👀",
+                    Message = $"{viewer.Name} (Matrimony ID: MS-{viewer.Id:D5}) viewed your profile.",
+                    AvatarUrl = viewer.ProfilePhotoUrl,
+                    ActionUrl = $"/search?profileId={viewer.Id}",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Notifications.Add(notification);
+
+                // 4. Send Email Notification
+                if (!string.IsNullOrEmpty(targetUser.Email) && targetUser.Email.Contains("@"))
+                {
+                    _ = _emailService.SendProfileViewNotificationEmailAsync(targetUser.Email, targetUser.Name, viewer.Name, viewer.Id);
+                }
+            }
+
             await _context.SaveChangesAsync();
             return true;
         }
