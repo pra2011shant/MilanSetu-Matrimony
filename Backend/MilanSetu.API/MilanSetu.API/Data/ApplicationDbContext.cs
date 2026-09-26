@@ -11,6 +11,7 @@ namespace MilanSetu.API.Data
         }
 
         public DbSet<User> Users { get; set; } = null!;
+        public DbSet<PasswordResetOtp> PasswordResetOtps { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

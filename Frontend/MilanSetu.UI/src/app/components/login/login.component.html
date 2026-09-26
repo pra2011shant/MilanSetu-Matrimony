@@ -1,0 +1,240 @@
+<div class="login-page">
+  <div class="container login-container">
+    
+    <div class="login-box-card">
+      <!-- Left Promotional Panel -->
+      <div class="promo-panel">
+        <div class="promo-content">
+          <div class="brand-badge">
+            <i class="bi bi-hearts"></i> MilanSetu
+          </div>
+          <h2>Find Your Sacred Life Partner</h2>
+          <p>Over 50,000+ verified matches with secure messaging, strict privacy, and family compatibility matching.</p>
+          
+          <div class="promo-features">
+            <div class="p-feat">
+              <i class="bi bi-shield-check"></i>
+              <span>100% ID Verified Genuine Profiles</span>
+            </div>
+            <div class="p-feat">
+              <i class="bi bi-lock"></i>
+              <span>Complete Photo & Contact Privacy</span>
+            </div>
+            <div class="p-feat">
+              <i class="bi bi-stars"></i>
+              <span>Intelligent Cultural Matchmaking</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Form Panel -->
+      <div class="form-panel">
+        
+        <!-- Alerts -->
+        <div class="alert alert-danger" *ngIf="errorMessage">
+          <i class="bi bi-exclamation-octagon-fill"></i>
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <div class="alert alert-success" *ngIf="successMessage">
+          <i class="bi bi-check-circle-fill"></i>
+          <span>{{ successMessage }}</span>
+        </div>
+
+        <div class="alert alert-info" *ngIf="otpPreviewMessage">
+          <i class="bi bi-info-circle-fill"></i>
+          <span>{{ otpPreviewMessage }}</span>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- 1. LOGIN FORM VIEW                                            -->
+        <!-- ============================================================= -->
+        <div *ngIf="authView === 'login'">
+          <div class="panel-header">
+            <h3>Welcome Back</h3>
+            <p>Please enter your registered email or mobile number to log in.</p>
+          </div>
+
+          <form (ngSubmit)="onLogin()" class="login-form">
+            <!-- Email / Mobile -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-person-fill"></i> Email or Mobile Number</label>
+              <div class="input-wrap">
+                <input
+                  type="text"
+                  [(ngModel)]="credentials.identifier"
+                  name="identifier"
+                  placeholder="e.g. rahul@example.com or 9876543210"
+                  class="form-control"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+              <div class="d-flex justify-between items-center">
+                <label class="form-label"><i class="bi bi-shield-lock-fill"></i> Password</label>
+                <a class="forgot-link" (click)="switchView('forgot_request')">Forgot Password?</a>
+              </div>
+              <div class="input-wrap password-wrap">
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  [(ngModel)]="credentials.password"
+                  name="password"
+                  placeholder="Enter your password"
+                  class="form-control password-input"
+                  required
+                />
+                <button type="button" class="btn-toggle-pw" (click)="togglePasswordVisibility()">
+                  <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Remember Me -->
+            <div class="form-group remember-wrap">
+              <label class="checkbox-label">
+                <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" />
+                <span>Keep me signed in</span>
+              </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary btn-submit btn-glow" [disabled]="isLoading">
+              <span *ngIf="!isLoading"><i class="bi bi-box-arrow-in-right"></i> Log In to Account</span>
+              <span *ngIf="isLoading"><i class="bi bi-arrow-repeat spin"></i> Verifying...</span>
+            </button>
+          </form>
+
+          <div class="form-footer">
+            <span>Don't have a MilanSetu profile yet? </span>
+            <a routerLink="/register" class="link-bold">Register Free</a>
+          </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- 2. FORGOT PASSWORD: REQUEST OTP VIEW                          -->
+        <!-- ============================================================= -->
+        <div *ngIf="authView === 'forgot_request'">
+          <div class="panel-header">
+            <h3>Reset Your Password</h3>
+            <p>Enter your registered Email or Mobile number to receive a 6-digit verification OTP.</p>
+          </div>
+
+          <form (ngSubmit)="onRequestOtp()" class="login-form">
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-envelope-check"></i> Registered Email or Mobile</label>
+              <input
+                type="text"
+                [(ngModel)]="forgotIdentifier"
+                name="forgotIdentifier"
+                placeholder="e.g. yourname@example.com or 9876543210"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-submit" [disabled]="isLoading">
+              <span *ngIf="!isLoading"><i class="bi bi-send-fill"></i> Send Verification OTP</span>
+              <span *ngIf="isLoading"><i class="bi bi-arrow-repeat spin"></i> Sending Code...</span>
+            </button>
+          </form>
+
+          <div class="form-footer">
+            <button class="btn-text" (click)="switchView('login')"><i class="bi bi-arrow-left"></i> Back to Login</button>
+          </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- 3. VERIFY OTP VIEW                                            -->
+        <!-- ============================================================= -->
+        <div *ngIf="authView === 'verify_otp'">
+          <div class="panel-header">
+            <h3>Enter 6-Digit OTP</h3>
+            <p>Please enter the 6-digit verification code sent to <strong>{{ forgotIdentifier }}</strong>.</p>
+          </div>
+
+          <form (ngSubmit)="onVerifyOtp()" class="login-form">
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-key-fill"></i> 6-Digit Code</label>
+              <input
+                type="text"
+                [(ngModel)]="otpCode"
+                name="otpCode"
+                maxlength="6"
+                placeholder="123456"
+                class="form-control text-center otp-input"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-submit" [disabled]="isLoading">
+              <span *ngIf="!isLoading"><i class="bi bi-patch-check"></i> Verify Code</span>
+              <span *ngIf="isLoading"><i class="bi bi-arrow-repeat spin"></i> Verifying...</span>
+            </button>
+          </form>
+
+          <div class="form-footer d-flex justify-between">
+            <button class="btn-text" (click)="onRequestOtp()"><i class="bi bi-arrow-clockwise"></i> Resend OTP</button>
+            <button class="btn-text" (click)="switchView('login')">Cancel</button>
+          </div>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- 4. SET NEW PASSWORD VIEW                                      -->
+        <!-- ============================================================= -->
+        <div *ngIf="authView === 'reset_password'">
+          <div class="panel-header">
+            <h3>Set New Password</h3>
+            <p>Create a strong password for your MilanSetu account.</p>
+          </div>
+
+          <form (ngSubmit)="onResetPassword()" class="login-form">
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-shield-lock"></i> New Password</label>
+              <input
+                type="password"
+                [(ngModel)]="newPassword"
+                name="newPassword"
+                placeholder="Minimum 6 characters"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-shield-check"></i> Confirm New Password</label>
+              <input
+                type="password"
+                [(ngModel)]="confirmNewPassword"
+                name="confirmNewPassword"
+                placeholder="Re-enter new password"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-submit" [disabled]="isLoading">
+              <span *ngIf="!isLoading"><i class="bi bi-check-circle"></i> Save & Update Password</span>
+              <span *ngIf="isLoading"><i class="bi bi-arrow-repeat spin"></i> Updating...</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- ============================================================= -->
+        <!-- 5. PASSWORD RESET SUCCESS VIEW                                -->
+        <!-- ============================================================= -->
+        <div *ngIf="authView === 'reset_success'" class="text-center py-4">
+          <div class="success-icon"><i class="bi bi-check-circle-fill"></i></div>
+          <h3>Password Reset Complete!</h3>
+          <p>Your password has been successfully updated. You can now log in with your new credentials.</p>
+          <button class="btn btn-primary mt-3" (click)="switchView('login')"><i class="bi bi-box-arrow-in-right"></i> Proceed to Login</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

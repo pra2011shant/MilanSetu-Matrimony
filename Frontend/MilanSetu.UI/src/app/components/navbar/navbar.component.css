@@ -153,6 +153,28 @@
   gap: 12px;
 }
 
+.user-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff1f2;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #fecdd3;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.user-nav-name {
+  color: #881337;
+}
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 0.82rem;
+}
+
 .btn {
   padding: 10px 20px;
   border-radius: 30px;

@@ -35,15 +35,27 @@
         <li><a routerLink="/register"><i class="bi bi-person-plus"></i> New Profile</a></li>
       </ul>
 
-      <!-- Auth Action Buttons -->
-      <div class="nav-actions">
-        <a routerLink="/register" class="btn btn-outline">
+      <!-- Auth Action Buttons (Dynamic based on login status) -->
+      <div class="nav-actions" *ngIf="!(authService.currentUser$ | async); else loggedInTpl">
+        <a routerLink="/login" class="btn btn-outline">
           <i class="bi bi-box-arrow-in-right"></i> Login
         </a>
         <a routerLink="/register" class="btn btn-primary btn-glow">
           <i class="bi bi-person-plus-fill"></i> Register Free
         </a>
       </div>
+
+      <ng-template #loggedInTpl>
+        <div class="nav-actions" *ngIf="authService.currentUser$ | async as user">
+          <div class="user-profile-badge">
+            <i class="bi bi-person-circle text-primary"></i>
+            <span class="user-nav-name">{{ user.name }}</span>
+          </div>
+          <button (click)="logout()" class="btn btn-outline btn-sm">
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </button>
+        </div>
+      </ng-template>
 
       <!-- Mobile Hamburger -->
       <button class="mobile-toggle" (click)="toggleMenu()" aria-label="Toggle navigation">
@@ -60,10 +72,16 @@
         <li><a routerLink="/" fragment="stories" (click)="toggleMenu()"><i class="bi bi-chat-heart"></i> Success Stories</a></li>
         <li><a routerLink="/register" (click)="toggleMenu()"><i class="bi bi-person-plus"></i> Register</a></li>
       </ul>
-      <div class="mobile-actions">
-        <a routerLink="/register" (click)="toggleMenu()" class="btn btn-outline w-100 mb-2"><i class="bi bi-box-arrow-in-right"></i> Login</a>
+      <div class="mobile-actions" *ngIf="!(authService.currentUser$ | async); else mobileLoggedInTpl">
+        <a routerLink="/login" (click)="toggleMenu()" class="btn btn-outline w-100 mb-2"><i class="bi bi-box-arrow-in-right"></i> Login</a>
         <a routerLink="/register" (click)="toggleMenu()" class="btn btn-primary w-100"><i class="bi bi-person-plus-fill"></i> Register Free</a>
       </div>
+      <ng-template #mobileLoggedInTpl>
+        <div class="mobile-actions" *ngIf="authService.currentUser$ | async as user">
+          <p class="mb-2 font-bold"><i class="bi bi-person-circle"></i> Logged in as: {{ user.name }}</p>
+          <button (click)="logout(); toggleMenu()" class="btn btn-outline w-100"><i class="bi bi-box-arrow-right"></i> Logout</button>
+        </div>
+      </ng-template>
     </div>
   </nav>
 </header>

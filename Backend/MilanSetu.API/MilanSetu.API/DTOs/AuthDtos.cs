@@ -41,12 +41,49 @@ namespace MilanSetu.API.DTOs
 
     public class LoginDto
     {
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress]
-        public string Email { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Email or Mobile number is required")]
+        public string Identifier { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; } = string.Empty;
+    }
+
+    public class ForgotPasswordDto
+    {
+        [Required(ErrorMessage = "Email or Mobile number is required")]
+        public string Identifier { get; set; } = string.Empty;
+    }
+
+    public class VerifyOtpDto
+    {
+        [Required(ErrorMessage = "Email or Mobile number is required")]
+        public string Identifier { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "6-digit OTP code is required")]
+        [StringLength(6, MinimumLength = 6, ErrorMessage = "OTP must be 6 digits")]
+        public string OtpCode { get; set; } = string.Empty;
+    }
+
+    public class ResetPasswordDto
+    {
+        [Required(ErrorMessage = "Email or Mobile number is required")]
+        public string Identifier { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "6-digit OTP code is required")]
+        [StringLength(6, MinimumLength = 6)]
+        public string OtpCode { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "New password is required")]
+        [MinLength(6, ErrorMessage = "New password must be at least 6 characters")]
+        public string NewPassword { get; set; } = string.Empty;
+    }
+
+    public class AuthResponseDto
+    {
+        public string Token { get; set; } = string.Empty;
+        public DateTime ExpiresAt { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public UserResponseDto User { get; set; } = null!;
     }
 
     public class UserResponseDto
