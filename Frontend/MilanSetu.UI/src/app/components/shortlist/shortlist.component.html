@@ -1,0 +1,129 @@
+<div class="shortlist-page">
+  <!-- Hero Banner -->
+  <section class="shortlist-hero">
+    <div class="container">
+      <div class="hero-inner">
+        <div>
+          <span class="badge-gold"><i class="bi bi-star-fill"></i> Saved Favorites</span>
+          <h1>My <span class="text-gold">Shortlisted Profiles</span></h1>
+          <p>Keep track of profiles you found appealing. Send Express Interest or connect directly with them anytime.</p>
+        </div>
+        <div class="hero-count-pill">
+          <span class="count-num">{{ shortlistedProfiles.length }}</span>
+          <span class="count-lbl">Profiles Saved</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Container -->
+  <div class="container main-content-wrap">
+    <!-- Toolbar -->
+    <div class="shortlist-toolbar">
+      <div class="search-input-wrap">
+        <i class="bi bi-search"></i>
+        <input type="text" [(ngModel)]="searchFilter" placeholder="Filter by Name, City, or Profession..." />
+      </div>
+      <div class="d-flex gap-2">
+        <a routerLink="/matches" class="btn btn-outline"><i class="bi bi-stars"></i> Browse Matches</a>
+        <a routerLink="/search" class="btn btn-primary"><i class="bi bi-search"></i> Advanced Search</a>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <p>Loading your saved profiles...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && filteredProfiles.length === 0">
+      <div class="empty-icon"><i class="bi bi-star"></i></div>
+      <h3>No Shortlisted Profiles Yet</h3>
+      <p>Browse matches and click the ⭐ Star button on profile cards to bookmark your favorites here.</p>
+      <div class="d-flex gap-3 justify-center mt-3">
+        <a routerLink="/matches" class="btn btn-primary"><i class="bi bi-stars"></i> Explore Matches</a>
+      </div>
+    </div>
+
+    <!-- Profiles Grid -->
+    <div class="shortlist-grid" *ngIf="!isLoading && filteredProfiles.length > 0">
+      <div class="shortlist-card" *ngFor="let p of filteredProfiles" (click)="openProfile(p)">
+        <div class="card-img-wrap">
+          <img [src]="p.imageUrl" [alt]="p.name" loading="lazy" />
+          <div class="img-badge score-pill"><i class="bi bi-heart-fill"></i> {{ p.matchScore }}% Match</div>
+          <button class="btn-remove-star" (click)="removeShortlist(p, $event)" title="Remove from shortlist">
+            <i class="bi bi-trash3-fill"></i>
+          </button>
+        </div>
+
+        <div class="card-body-content">
+          <div class="card-head">
+            <h3 class="name">{{ p.name }} <i class="bi bi-patch-check-fill text-primary" *ngIf="p.verified"></i></h3>
+            <span class="sub">{{ p.profileId }} • {{ p.age }} Yrs, {{ p.height }}</span>
+          </div>
+
+          <div class="specs-list">
+            <div><i class="bi bi-mortarboard text-emerald"></i> {{ p.education }}</div>
+            <div><i class="bi bi-briefcase text-blue"></i> {{ p.profession }}</div>
+            <div><i class="bi bi-person-check text-rose"></i> {{ p.religion }} ({{ p.caste }})</div>
+            <div><i class="bi bi-geo-alt-fill text-rose"></i> {{ p.location }}</div>
+            <div><i class="bi bi-cash-stack text-amber"></i> {{ p.annualIncome }}</div>
+          </div>
+
+          <div class="card-actions">
+            <button class="btn btn-primary" [class.btn-sent]="p.interestStatus === 'Pending'" (click)="sendInterest(p, $event)">
+              <i class="bi" [ngClass]="p.interestStatus === 'Pending' ? 'bi-check2-circle' : 'bi-heart-fill'"></i>
+              <span>{{ p.interestStatus === 'Pending' ? 'Interest Sent' : 'Send Interest' }}</span>
+            </button>
+            <button class="btn btn-outline" (click)="openProfile(p)">
+              <i class="bi bi-person-lines-fill"></i> View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Detail Modal -->
+  <div class="modal-backdrop" *ngIf="selectedProfileForModal" (click)="closeProfile()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="d-flex items-center gap-3">
+          <img [src]="selectedProfileForModal.imageUrl" class="modal-avatar" alt="Avatar" />
+          <div>
+            <h3>{{ selectedProfileForModal.name }}</h3>
+            <span class="modal-subtitle">{{ selectedProfileForModal.profileId }} • {{ selectedProfileForModal.age }} Yrs, {{ selectedProfileForModal.height }} • {{ selectedProfileForModal.location }}</span>
+          </div>
+        </div>
+        <button class="btn-close-modal" (click)="closeProfile()"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="modal-body-content">
+        <div class="spec-grid">
+          <div class="spec-item"><span class="spec-label">Education:</span> <span class="spec-val">{{ selectedProfileForModal.education }}</span></div>
+          <div class="spec-item"><span class="spec-label">Profession:</span> <span class="spec-val">{{ selectedProfileForModal.profession }}</span></div>
+          <div class="spec-item"><span class="spec-label">Income:</span> <span class="spec-val text-gold font-bold">{{ selectedProfileForModal.annualIncome }}</span></div>
+          <div class="spec-item"><span class="spec-label">Religion / Community:</span> <span class="spec-val">{{ selectedProfileForModal.religion }} - {{ selectedProfileForModal.caste }}</span></div>
+          <div class="spec-item"><span class="spec-label">Mother Tongue:</span> <span class="spec-val">{{ selectedProfileForModal.motherTongue }}</span></div>
+          <div class="spec-item"><span class="spec-label">Location:</span> <span class="spec-val">{{ selectedProfileForModal.location }}</span></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="removeShortlist(selectedProfileForModal, $event); closeProfile()">
+          <i class="bi bi-trash3"></i> Remove Shortlist
+        </button>
+        <button class="btn btn-primary" (click)="sendInterest(selectedProfileForModal, $event)">
+          <i class="bi bi-heart-fill"></i> Send Express Interest
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-popup" *ngIf="toastMessage">
+    <i class="bi bi-check-circle-fill text-gold"></i>
+    <span>{{ toastMessage }}</span>
+  </div>
+</div>

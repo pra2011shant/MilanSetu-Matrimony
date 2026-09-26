@@ -17,6 +17,8 @@ namespace MilanSetu.API.Data
         public DbSet<ProfileView> ProfileViews { get; set; } = null!;
         public DbSet<UserShortlist> UserShortlists { get; set; } = null!;
         public DbSet<UserInterest> UserInterests { get; set; } = null!;
+        public DbSet<ChatMessage> ChatMessages { get; set; } = null!;
+        public DbSet<Notification> Notifications { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -65,6 +67,27 @@ namespace MilanSetu.API.Data
                       .WithMany()
                       .HasForeignKey(ui => ui.ReceiverUserId)
                       .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<ChatMessage>(entity =>
+            {
+                entity.HasOne(cm => cm.Sender)
+                      .WithMany()
+                      .HasForeignKey(cm => cm.SenderId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(cm => cm.Receiver)
+                      .WithMany()
+                      .HasForeignKey(cm => cm.ReceiverId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.HasOne(n => n.User)
+                      .WithMany()
+                      .HasForeignKey(n => n.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

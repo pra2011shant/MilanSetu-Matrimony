@@ -1,0 +1,149 @@
+<div class="chat-app-wrapper">
+  <div class="container-fluid chat-container">
+    <!-- Left Sidebar: Conversations -->
+    <aside class="chat-sidebar">
+      <div class="sidebar-header">
+        <div class="d-flex justify-between items-center mb-3">
+          <h2><i class="bi bi-chat-heart-fill text-rose"></i> Messages</h2>
+          <span class="live-status-pill" [class.connected]="chatService.isConnected$ | async">
+            <span class="pulse-dot"></span> {{ (chatService.isConnected$ | async) ? 'Live Chat' : 'Connecting' }}
+          </span>
+        </div>
+
+        <div class="search-conv-box">
+          <i class="bi bi-search"></i>
+          <input type="text" [(ngModel)]="searchFilter" placeholder="Search conversations..." />
+        </div>
+      </div>
+
+      <!-- Conversations List -->
+      <div class="conversations-list">
+        <div class="loading-state-sm" *ngIf="isLoadingConversations">
+          <div class="spinner-sm"></div>
+          <span>Loading conversations...</span>
+        </div>
+
+        <div class="empty-convs" *ngIf="!isLoadingConversations && filteredConversations.length === 0">
+          <i class="bi bi-chat-square-dots text-muted"></i>
+          <p>No conversations yet. Accept interests to start chatting!</p>
+          <a routerLink="/interests" class="btn btn-sm btn-outline mt-2">View Interests</a>
+        </div>
+
+        <div class="conv-item" *ngFor="let conv of filteredConversations" [class.active]="activeConversation?.userId === conv.userId" (click)="selectConversation(conv)">
+          <div class="avatar-wrap">
+            <img [src]="conv.imageUrl" [alt]="conv.name" />
+            <span class="online-dot" *ngIf="conv.isOnline"></span>
+          </div>
+
+          <div class="conv-details">
+            <div class="conv-top-row">
+              <span class="conv-name">{{ conv.name }} <i class="bi bi-patch-check-fill text-primary" *ngIf="conv.isVerified"></i></span>
+              <span class="conv-time">{{ conv.lastMessageTime | date:'shortTime' }}</span>
+            </div>
+            <div class="conv-bottom-row">
+              <span class="conv-snippet">{{ conv.lastMessage }}</span>
+              <span class="unread-badge" *ngIf="conv.unreadCount > 0">{{ conv.unreadCount }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Right Pane: Active Chat Window -->
+    <main class="chat-main-window" *ngIf="activeConversation; else noActiveChat">
+      <!-- Chat Header -->
+      <header class="chat-header">
+        <div class="user-meta-left">
+          <div class="avatar-wrap">
+            <img [src]="activeConversation.imageUrl" [alt]="activeConversation.name" />
+            <span class="online-dot" *ngIf="activeConversation.isOnline"></span>
+          </div>
+          <div>
+            <h3>{{ activeConversation.name }} <i class="bi bi-patch-check-fill text-primary" *ngIf="activeConversation.isVerified"></i></h3>
+            <span class="header-sub">{{ activeConversation.profession }} • {{ activeConversation.location }}</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <a routerLink="/matches" class="btn-icon" title="View Full Profile"><i class="bi bi-person-lines-fill"></i></a>
+          <a routerLink="/interests" class="btn-icon" title="Contact Details"><i class="bi bi-telephone-fill"></i></a>
+        </div>
+      </header>
+
+      <!-- Message Bubbles Scroll Area -->
+      <div class="messages-area" #messagesScrollContainer>
+        <div class="security-banner">
+          <i class="bi bi-shield-check-fill text-gold"></i>
+          <span>End-to-end verified matrimonial communication. Please maintain respectful conversation.</span>
+        </div>
+
+        <div class="loading-state-sm" *ngIf="isLoadingMessages">
+          <div class="spinner-sm"></div>
+          <span>Loading messages...</span>
+        </div>
+
+        <!-- Messages Stream -->
+        <div class="message-row" *ngFor="let msg of messages" [class.mine]="msg.isMine" [class.theirs]="!msg.isMine">
+          <div class="bubble-wrap">
+            <div class="message-bubble">
+              <p>{{ msg.content }}</p>
+              <div class="bubble-meta">
+                <span class="time">{{ msg.sentAt | date:'shortTime' }}</span>
+                <span class="read-receipt" *ngIf="msg.isMine">
+                  <i class="bi" [ngClass]="msg.isRead ? 'bi-check2-all text-primary' : 'bi-check2'"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="typing-bubble-row" *ngIf="isRecipientTyping">
+          <div class="typing-pill">
+            <span>{{ activeConversation.name }} is typing</span>
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Icebreaker Suggestions -->
+      <div class="icebreakers-bar" *ngIf="messages.length <= 2">
+        <span class="icebreaker-label">💡 Quick Icebreakers:</span>
+        <button class="icebreaker-chip" *ngFor="let prompt of quickIcebreakers" (click)="sendMessage(prompt)">
+          {{ prompt }}
+        </button>
+      </div>
+
+      <!-- Chat Input Bar -->
+      <footer class="chat-input-bar">
+        <button class="btn-emoji" type="button" (click)="sendMessage('🙏 Namaste!')" title="Send Namaste">🙏</button>
+        <button class="btn-emoji" type="button" (click)="sendMessage('❤️')" title="Send Heart">❤️</button>
+        
+        <input
+          type="text"
+          class="chat-text-input"
+          [(ngModel)]="newMessageText"
+          (input)="onTyping()"
+          (keydown.enter)="sendMessage()"
+          placeholder="Type a thoughtful message to {{ activeConversation.name }}..."
+        />
+
+        <button class="btn-send-message" [disabled]="!newMessageText.trim()" (click)="sendMessage()">
+          <i class="bi bi-send-fill"></i>
+        </button>
+      </footer>
+    </main>
+
+    <!-- Fallback when no conversation selected -->
+    <ng-template #noActiveChat>
+      <div class="no-chat-selected">
+        <div class="empty-icon-wrap">
+          <i class="bi bi-chat-heart"></i>
+        </div>
+        <h3>Select a Conversation to Start Chatting</h3>
+        <p>Pick a match from the left panel to begin real-time messaging, or explore new matches.</p>
+        <a routerLink="/matches" class="btn btn-primary mt-3"><i class="bi bi-stars"></i> Explore Matches</a>
+      </div>
+    </ng-template>
+  </div>
+</div>

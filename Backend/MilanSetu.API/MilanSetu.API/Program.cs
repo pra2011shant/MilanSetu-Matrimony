@@ -56,6 +56,7 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 
 // Swagger with JWT Support
 builder.Services.AddEndpointsApiExplorer();
@@ -103,6 +104,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<MilanSetu.API.Hubs.ChatHub>("/hubs/chat");
 
 // Auto-migrate database on application startup
 using (var scope = app.Services.CreateScope())

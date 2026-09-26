@@ -29,12 +29,45 @@
       <!-- Desktop Nav Menu -->
       <ul class="nav-links">
         <li><a routerLink="/" class="active"><i class="bi bi-house-door"></i> Home</a></li>
-        <li><a routerLink="/matches"><i class="bi bi-stars text-gold"></i> My Matches</a></li>
+        <li><a routerLink="/matches"><i class="bi bi-stars text-gold"></i> Matches</a></li>
         <li><a routerLink="/interests"><i class="bi bi-heart-pulse-fill text-rose"></i> Interests</a></li>
+        <li><a routerLink="/chat"><i class="bi bi-chat-dots-fill text-blue"></i> Chat</a></li>
+        <li><a routerLink="/shortlist"><i class="bi bi-star-fill text-amber"></i> Shortlist</a></li>
         <li><a routerLink="/search"><i class="bi bi-search-heart"></i> Search</a></li>
-        <li><a routerLink="/partner-preference"><i class="bi bi-sliders text-primary"></i> Partner Preference</a></li>
-        <li><a routerLink="/my-profile"><i class="bi bi-person-circle"></i> My Profile</a></li>
+        <li><a routerLink="/partner-preference"><i class="bi bi-sliders text-primary"></i> Preferences</a></li>
+        <li><a routerLink="/my-profile"><i class="bi bi-person-circle"></i> Profile</a></li>
       </ul>
+
+      <!-- Notification Bell -->
+      <div class="notif-wrapper">
+        <button class="btn-notif-bell" (click)="toggleNotifications()" title="Notifications">
+          <i class="bi bi-bell-fill"></i>
+          <span class="notif-dot" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+        </button>
+
+        <!-- Notification Popover Window -->
+        <div class="notif-dropdown" *ngIf="isNotificationsOpen">
+          <div class="notif-header">
+            <span class="font-bold">Notifications</span>
+            <button class="btn-read-all" (click)="markAllRead()">Mark all as read</button>
+          </div>
+          <div class="notif-list">
+            <div class="notif-item" *ngFor="let n of notifications" [class.unread]="!n.isRead">
+              <div class="notif-icon-wrap">
+                <i class="bi bi-heart-fill text-rose" *ngIf="n.type === 'Interest'"></i>
+                <i class="bi bi-eye-fill text-blue" *ngIf="n.type === 'ProfileView'"></i>
+                <i class="bi bi-chat-dots-fill text-emerald" *ngIf="n.type === 'Message'"></i>
+                <i class="bi bi-patch-check-fill text-gold" *ngIf="n.type === 'Verification'"></i>
+              </div>
+              <div class="notif-text">
+                <div class="notif-title">{{ n.title }}</div>
+                <div class="notif-desc">{{ n.message }}</div>
+                <div class="notif-time">{{ n.createdAt | date:'shortTime' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Auth Action Buttons (Dynamic based on login status) -->
       <div class="nav-actions" *ngIf="!(authService.currentUser$ | async); else loggedInTpl">
@@ -68,10 +101,11 @@
     <div class="mobile-menu" [class.open]="isMenuOpen">
       <ul class="mobile-nav-links">
         <li><a routerLink="/" (click)="toggleMenu()"><i class="bi bi-house-door"></i> Home</a></li>
-        <li><a routerLink="/matches" (click)="toggleMenu()"><i class="bi bi-stars text-gold"></i> My Matches</a></li>
+        <li><a routerLink="/matches" (click)="toggleMenu()"><i class="bi bi-stars text-gold"></i> Matches</a></li>
         <li><a routerLink="/interests" (click)="toggleMenu()"><i class="bi bi-heart-pulse-fill text-rose"></i> Interests</a></li>
-        <li><a routerLink="/search" (click)="toggleMenu()"><i class="bi bi-search-heart"></i> Search
-            Matches</a></li>
+        <li><a routerLink="/chat" (click)="toggleMenu()"><i class="bi bi-chat-dots-fill text-blue"></i> Chat Messages</a></li>
+        <li><a routerLink="/shortlist" (click)="toggleMenu()"><i class="bi bi-star-fill text-amber"></i> Saved Shortlist</a></li>
+        <li><a routerLink="/search" (click)="toggleMenu()"><i class="bi bi-search-heart"></i> Search Matches</a></li>
         <li><a routerLink="/partner-preference" (click)="toggleMenu()"><i class="bi bi-sliders text-primary"></i> Partner Preference</a></li>
         <li><a routerLink="/my-profile" (click)="toggleMenu()"><i class="bi bi-person-circle"></i> My Profile</a></li>
         <li><a routerLink="/register" (click)="toggleMenu()"><i class="bi bi-person-plus"></i> Register</a></li>
