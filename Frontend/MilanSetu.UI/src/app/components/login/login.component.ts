@@ -93,40 +93,24 @@ export class LoginComponent {
   }
 
   // 2. Google OAuth Login
-  onGoogleLogin() {
+  async onGoogleLogin() {
+    const googleAccount = await this.alertService.promptGoogleAuth('Sign in with Google');
+    if (!googleAccount) {
+      return;
+    }
+
     this.isLoading = true;
-    
-    // Google OAuth simulation with verified Google credentials
-    const sampleGoogleUsers = [
-      {
-        name: 'Prashant Kumar',
-        email: 'prashant.kumar@gmail.com',
-        photoUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=500&q=80',
-        googleId: 'google_oauth_1092837465'
-      },
-      {
-        name: 'Pooja Sharma',
-        email: 'pooja.sharma@gmail.com',
-        photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80',
-        googleId: 'google_oauth_9876543210'
-      }
-    ];
-
-    const selectedUser = sampleGoogleUsers[0];
-
-    this.authService.googleLogin(selectedUser).subscribe({
+    this.authService.googleLogin(googleAccount).subscribe({
       next: (res) => {
         this.isLoading = false;
         this.alertService.success('Google Login Successful! 🎉', `Authenticated as ${res.user.name} (${res.user.email}). Redirecting to your dashboard...`).then(() => {
           this.router.navigate(['/']);
         });
       },
-      error: () => {
+      error: (err) => {
         this.isLoading = false;
-        this.alertService.toastSuccess(`Authenticated via Google as ${selectedUser.name}`, 'Google Sign-In');
-        setTimeout(() => {
-          this.router.navigate(['/']);
-        }, 1200);
+        const errMsg = err?.error?.message || 'Google authentication failed. Please try again.';
+        this.alertService.toastError(errMsg);
       }
     });
   }

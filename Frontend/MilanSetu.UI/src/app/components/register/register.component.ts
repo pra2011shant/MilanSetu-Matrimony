@@ -149,30 +149,24 @@ export class RegisterComponent implements OnInit {
     return true;
   }
 
-  onGoogleRegister() {
-    this.isLoading = true;
-    const sampleGoogleUsers = [
-      {
-        name: 'Prashant Kumar',
-        email: 'prashant.kumar@gmail.com',
-        photoUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=500&q=80',
-        googleId: 'google_oauth_1092837465'
-      }
-    ];
-    const googleUser = sampleGoogleUsers[0];
+  async onGoogleRegister() {
+    const googleAccount = await this.alertService.promptGoogleAuth('Sign up Fast with Google');
+    if (!googleAccount) {
+      return;
+    }
 
-    this.authService.googleLogin(googleUser).subscribe({
+    this.isLoading = true;
+    this.authService.googleLogin(googleAccount).subscribe({
       next: (res) => {
         this.isLoading = false;
         this.registeredUser = res.user;
         this.currentStep = 4;
-        this.alertService.success('Google Registration Successful! 🎉', `Welcome to MilanSetu, ${res.user.name}!`);
+        this.alertService.success('Google Registration Complete! 🎉', `Welcome to MilanSetu, ${res.user.name}! Your account has been created.`);
       },
-      error: () => {
+      error: (err) => {
         this.isLoading = false;
-        this.registeredUser = { name: googleUser.name, email: googleUser.email, id: 'MS-7892' };
-        this.currentStep = 4;
-        this.alertService.toastSuccess(`Registered via Google as ${googleUser.name}`, 'Registration Complete');
+        const errMsg = err?.error?.message || 'Google registration failed. Please try again.';
+        this.alertService.toastError(errMsg);
       }
     });
   }
