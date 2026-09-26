@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { PartnerPreferenceService, PartnerPreference } from '../../services/partner-preference.service';
 import { AlertService } from '../../services/alert.service';
+import { MasterDataService } from '../../services/master-data.service';
 
 @Component({
   selector: 'app-partner-preference',
@@ -33,6 +34,7 @@ export class PartnerPreferenceComponent implements OnInit {
 
   constructor(
     private prefService: PartnerPreferenceService,
+    private masterDataService: MasterDataService,
     private router: Router,
     private alertService: AlertService
   ) {}
@@ -149,7 +151,24 @@ export class PartnerPreferenceComponent implements OnInit {
   estimatedMatches = 1420;
 
   ngOnInit(): void {
+    this.loadMasterData();
     this.loadPreferences();
+  }
+
+  loadMasterData(): void {
+    this.masterDataService.getMasterData().subscribe({
+      next: (data) => {
+        if (data) {
+          if (data.religions) this.religions = ['Any Religion', ...data.religions];
+          if (data.motherTongues) this.motherTongues = ['Any Language', ...data.motherTongues];
+          if (data.educations) this.educationOptions = ['Any Education Level', ...data.educations];
+          if (data.occupations) this.professionOptions = ['Any Profession', ...data.occupations];
+          if (data.incomeRanges) this.incomeOptions = ['No Income Bar', ...data.incomeRanges];
+          if (data.locations) this.popularCities = ['Any Location in India / Open to Relocate', ...data.locations];
+        }
+      },
+      error: () => {}
+    });
   }
 
   loadPreferences(): void {

@@ -19,6 +19,13 @@ namespace MilanSetu.API.Data
         public DbSet<UserInterest> UserInterests { get; set; } = null!;
         public DbSet<ChatMessage> ChatMessages { get; set; } = null!;
         public DbSet<Notification> Notifications { get; set; } = null!;
+        public DbSet<SuccessStory> SuccessStories { get; set; } = null!;
+        public DbSet<MasterReligion> MasterReligions { get; set; } = null!;
+        public DbSet<MasterMotherTongue> MasterMotherTongues { get; set; } = null!;
+        public DbSet<MasterEducation> MasterEducations { get; set; } = null!;
+        public DbSet<MasterOccupation> MasterOccupations { get; set; } = null!;
+        public DbSet<MasterIncomeRange> MasterIncomeRanges { get; set; } = null!;
+        public DbSet<MasterLocation> MasterLocations { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService, RegisterRequest } from '../../services/auth.service';
 import { AlertService } from '../../services/alert.service';
+import { MasterDataService } from '../../services/master-data.service';
 
 @Component({
   selector: 'app-register',
@@ -12,7 +13,7 @@ import { AlertService } from '../../services/alert.service';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   currentStep = 1;
   totalSteps = 3;
   isLoading = false;
@@ -22,6 +23,7 @@ export class RegisterComponent {
 
   constructor(
     private authService: AuthService,
+    private masterDataService: MasterDataService,
     private router: Router,
     private alertService: AlertService
   ) {}
@@ -43,49 +45,23 @@ export class RegisterComponent {
   showPassword = false;
   agreeTerms = true;
 
-  // Religions & Mother Tongues
-  religions: string[] = [
-    'Hindu',
-    'Muslim',
-    'Sikh',
-    'Christian',
-    'Jain',
-    'Buddhist',
-    'Parsi',
-    'Jewish',
-    'Other'
-  ];
+  // Master Lists fetched dynamically from Database
+  religions: string[] = [];
+  motherTongues: string[] = [];
+  popularLocations: string[] = [];
 
-  motherTongues: string[] = [
-    'Hindi',
-    'Punjabi',
-    'Bengali',
-    'Marathi',
-    'Gujarati',
-    'Tamil',
-    'Telugu',
-    'Kannada',
-    'Malayalam',
-    'Odia',
-    'Marwari',
-    'Assamese',
-    'Urdu',
-    'English'
-  ];
-
-  popularLocations: string[] = [
-    'Mumbai, Maharashtra',
-    'Delhi NCR',
-    'Bengaluru, Karnataka',
-    'Pune, Maharashtra',
-    'Hyderabad, Telangana',
-    'Chennai, Tamil Nadu',
-    'Kolkata, West Bengal',
-    'Ahmedabad, Gujarat',
-    'Jaipur, Rajasthan',
-    'Lucknow, Uttar Pradesh',
-    'Chandigarh / Mohali'
-  ];
+  ngOnInit(): void {
+    this.masterDataService.getMasterData().subscribe({
+      next: (data) => {
+        if (data) {
+          this.religions = data.religions || [];
+          this.motherTongues = data.motherTongues || [];
+          this.popularLocations = data.locations || [];
+        }
+      },
+      error: () => {}
+    });
+  }
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;

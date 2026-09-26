@@ -215,6 +215,98 @@ BEGIN
 END
 GO
 
+-- 10. SUCCESS STORIES TABLE
+IF OBJECT_ID('dbo.SuccessStories', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.SuccessStories (
+        Id INT IDENTITY(1,1) NOT NULL,
+        CoupleName NVARCHAR(150) NOT NULL,
+        WeddingDate NVARCHAR(50) NOT NULL,
+        Location NVARCHAR(150) NOT NULL,
+        ImageUrl NVARCHAR(MAX) NOT NULL,
+        Quote NVARCHAR(500) NOT NULL,
+        StorySnippet NVARCHAR(MAX) NOT NULL,
+        IsFeatured BIT NOT NULL CONSTRAINT DF_SuccessStories_IsFeatured DEFAULT (1),
+        CreatedAt DATETIME2(7) NOT NULL CONSTRAINT DF_SuccessStories_CreatedAt DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT PK_SuccessStories PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
+-- 11. MASTER DROPDOWN TABLES
+IF OBJECT_ID('dbo.MasterReligions', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.MasterReligions (
+        Id INT IDENTITY(1,1) NOT NULL,
+        Name NVARCHAR(100) NOT NULL,
+        DisplayOrder INT NOT NULL CONSTRAINT DF_MasterReligions_Order DEFAULT (0),
+        IsActive BIT NOT NULL CONSTRAINT DF_MasterReligions_Active DEFAULT (1),
+        CONSTRAINT PK_MasterReligions PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
+IF OBJECT_ID('dbo.MasterMotherTongues', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.MasterMotherTongues (
+        Id INT IDENTITY(1,1) NOT NULL,
+        Name NVARCHAR(100) NOT NULL,
+        DisplayOrder INT NOT NULL CONSTRAINT DF_MasterMotherTongues_Order DEFAULT (0),
+        IsActive BIT NOT NULL CONSTRAINT DF_MasterMotherTongues_Active DEFAULT (1),
+        CONSTRAINT PK_MasterMotherTongues PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
+IF OBJECT_ID('dbo.MasterEducations', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.MasterEducations (
+        Id INT IDENTITY(1,1) NOT NULL,
+        Name NVARCHAR(100) NOT NULL,
+        DisplayOrder INT NOT NULL CONSTRAINT DF_MasterEducations_Order DEFAULT (0),
+        IsActive BIT NOT NULL CONSTRAINT DF_MasterEducations_Active DEFAULT (1),
+        CONSTRAINT PK_MasterEducations PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
+IF OBJECT_ID('dbo.MasterOccupations', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.MasterOccupations (
+        Id INT IDENTITY(1,1) NOT NULL,
+        Name NVARCHAR(100) NOT NULL,
+        DisplayOrder INT NOT NULL CONSTRAINT DF_MasterOccupations_Order DEFAULT (0),
+        IsActive BIT NOT NULL CONSTRAINT DF_MasterOccupations_Active DEFAULT (1),
+        CONSTRAINT PK_MasterOccupations PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
+IF OBJECT_ID('dbo.MasterIncomeRanges', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.MasterIncomeRanges (
+        Id INT IDENTITY(1,1) NOT NULL,
+        RangeText NVARCHAR(100) NOT NULL,
+        DisplayOrder INT NOT NULL CONSTRAINT DF_MasterIncomeRanges_Order DEFAULT (0),
+        IsActive BIT NOT NULL CONSTRAINT DF_MasterIncomeRanges_Active DEFAULT (1),
+        CONSTRAINT PK_MasterIncomeRanges PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
+IF OBJECT_ID('dbo.MasterLocations', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.MasterLocations (
+        Id INT IDENTITY(1,1) NOT NULL,
+        CityName NVARCHAR(100) NOT NULL,
+        StateName NVARCHAR(100) NULL,
+        DisplayOrder INT NOT NULL CONSTRAINT DF_MasterLocations_Order DEFAULT (0),
+        IsActive BIT NOT NULL CONSTRAINT DF_MasterLocations_Active DEFAULT (1),
+        CONSTRAINT PK_MasterLocations PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
 -- INDEXES
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_Users_Email')
     CREATE UNIQUE NONCLUSTERED INDEX IX_Users_Email ON dbo.Users (Email ASC);
@@ -232,5 +324,71 @@ IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_UserProfiles_UserId')
 IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_PartnerPreferences_UserId')
     CREATE UNIQUE NONCLUSTERED INDEX IX_PartnerPreferences_UserId ON dbo.PartnerPreferences (UserId ASC);
 
-PRINT '>>> All MilanSetu Tables & Indexes Initialized! <<<';
+-- SEED SUCCESS STORIES
+IF NOT EXISTS (SELECT 1 FROM dbo.SuccessStories)
+BEGIN
+    INSERT INTO dbo.SuccessStories (CoupleName, WeddingDate, Location, ImageUrl, Quote, StorySnippet, IsFeatured, CreatedAt)
+    VALUES
+    (N'Vikram & Radhika', N'December 2025', N'Jaipur Palace, Rajasthan', N'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=600&q=80', N'"We connected on MilanSetu with just one click, and found a lifetime of unconditional love and laughter!"', N'Vikram from Pune and Radhika from Jaipur matched through verified filters. Their shared love for travel and family values led to a beautiful destination wedding.', 1, SYSUTCDATETIME()),
+    (N'Aman & Harpreet', N'November 2025', N'Amritsar, Punjab', N'https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=600&q=80', N'"MilanSetu’s verified profiles gave our families 100% peace of mind and the perfect life companion."', N'Both working in healthcare, they found true alignment in aspirations and core Punjabi values within 3 weeks of connecting on the portal.', 1, SYSUTCDATETIME()),
+    (N'Arjun & Sneha', N'January 2026', N'Udaipur, Rajasthan', N'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80', N'"Found my soulmate who understands my career goals and cherishes cultural traditions equally."', N'From our first chat on MilanSetu to meeting each other’s families, everything felt naturally right. Forever grateful!', 1, SYSUTCDATETIME());
+END
+
+-- SEED MASTER DATA
+IF NOT EXISTS (SELECT 1 FROM dbo.MasterReligions)
+BEGIN
+    INSERT INTO dbo.MasterReligions (Name, DisplayOrder, IsActive) VALUES 
+    (N'Hindu', 1, 1), (N'Muslim', 2, 1), (N'Sikh', 3, 1), (N'Christian', 4, 1), 
+    (N'Jain', 5, 1), (N'Buddhist', 6, 1), (N'Parsi', 7, 1), (N'Jewish', 8, 1), (N'Other', 9, 1);
+END
+
+IF NOT EXISTS (SELECT 1 FROM dbo.MasterMotherTongues)
+BEGIN
+    INSERT INTO dbo.MasterMotherTongues (Name, DisplayOrder, IsActive) VALUES 
+    (N'Hindi', 1, 1), (N'Bengali', 2, 1), (N'Marathi', 3, 1), (N'Telugu', 4, 1), 
+    (N'Tamil', 5, 1), (N'Gujarati', 6, 1), (N'Urdu', 7, 1), (N'Kannada', 8, 1), 
+    (N'Odia', 9, 1), (N'Malayalam', 10, 1), (N'Punjabi', 11, 1), (N'Assamese', 12, 1), 
+    (N'Maithili', 13, 1), (N'English', 14, 1);
+END
+
+IF NOT EXISTS (SELECT 1 FROM dbo.MasterEducations)
+BEGIN
+    INSERT INTO dbo.MasterEducations (Name, DisplayOrder, IsActive) VALUES 
+    (N'B.Tech / B.E / B.S', 1, 1), (N'M.Tech / M.E / M.S', 2, 1), (N'MBA / PGDM', 3, 1), 
+    (N'BCA / MCA / B.Sc IT', 4, 1), (N'MBBS / MD / MS / BDS', 5, 1), (N'CA / CS / ICWA / CFA', 6, 1), 
+    (N'B.Com / M.Com', 7, 1), (N'B.A / M.A', 8, 1), (N'LLB / LLM', 9, 1), 
+    (N'Ph.D / Doctorate', 10, 1), (N'Diploma / Polytechnic', 11, 1), (N'Higher Secondary / 12th', 12, 1);
+END
+
+IF NOT EXISTS (SELECT 1 FROM dbo.MasterOccupations)
+BEGIN
+    INSERT INTO dbo.MasterOccupations (Name, DisplayOrder, IsActive) VALUES 
+    (N'Software Engineer / Architect', 1, 1), (N'Data Scientist / AI Specialist', 2, 1), 
+    (N'Doctor / Surgeon / Healthcare', 3, 1), (N'Chartered Accountant / Finance', 4, 1), 
+    (N'Civil Services / IAS / IPS / Govt', 5, 1), (N'Business Owner / Entrepreneur', 6, 1), 
+    (N'Professor / Lecturer / Teacher', 7, 1), (N'Marketing & Product Manager', 8, 1), 
+    (N'Banker / Financial Analyst', 9, 1), (N'Lawyer / Legal Advisor', 10, 1), 
+    (N'Architect / Interior Designer', 11, 1), (N'Defense Forces (Army/Navy/Air Force)', 12, 1);
+END
+
+IF NOT EXISTS (SELECT 1 FROM dbo.MasterIncomeRanges)
+BEGIN
+    INSERT INTO dbo.MasterIncomeRanges (RangeText, DisplayOrder, IsActive) VALUES 
+    (N'₹3 - ₹5 Lakhs', 1, 1), (N'₹5 - ₹7 Lakhs', 2, 1), (N'₹7 - ₹10 Lakhs', 3, 1), 
+    (N'₹10 - ₹15 Lakhs', 4, 1), (N'₹15 - ₹25 Lakhs', 5, 1), (N'₹25 - ₹50 Lakhs', 6, 1), 
+    (N'₹50 Lakhs - ₹1 Crore', 7, 1), (N'₹1 Crore & Above', 8, 1);
+END
+
+IF NOT EXISTS (SELECT 1 FROM dbo.MasterLocations)
+BEGIN
+    INSERT INTO dbo.MasterLocations (CityName, StateName, DisplayOrder, IsActive) VALUES 
+    (N'Mumbai', N'Maharashtra', 1, 1), (N'Delhi NCR', N'Delhi', 2, 1), 
+    (N'Bengaluru', N'Karnataka', 3, 1), (N'Pune', N'Maharashtra', 4, 1), 
+    (N'Hyderabad', N'Telangana', 5, 1), (N'Chennai', N'Tamil Nadu', 6, 1), 
+    (N'Kolkata', N'West Bengal', 7, 1), (N'Ahmedabad', N'Gujarat', 8, 1), 
+    (N'Jaipur', N'Rajasthan', 9, 1), (N'Lucknow', N'Uttar Pradesh', 10, 1), 
+    (N'Chandigarh', N'Punjab', 11, 1), (N'Indore', N'Madhya Pradesh', 12, 1);
+END
+
+PRINT '>>> All MilanSetu Tables, Master Data & Seed Data Initialized! <<<';
 GO

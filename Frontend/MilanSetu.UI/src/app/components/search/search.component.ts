@@ -6,6 +6,8 @@ import { SearchService, SearchFilter, SearchResultItem } from '../../services/se
 import { MatchesService } from '../../services/matches.service';
 import { AlertService } from '../../services/alert.service';
 
+import { MasterDataService } from '../../services/master-data.service';
+
 @Component({
   selector: 'app-search',
   standalone: true,
@@ -43,92 +45,30 @@ export class SearchComponent implements OnInit {
   selectedProfile: SearchResultItem | null = null;
   toastMessage: string | null = null;
 
-  // Dropdown Lists
-  ageOptions: number[] = Array.from({ length: 43 }, (_, i) => 18 + i); // 18 to 60
-  
+  // Dynamic Dropdown Lists from Database
+  ageOptions: number[] = Array.from({ length: 43 }, (_, i) => 18 + i);
   heightOptions: string[] = [
     "4'10\"", "4'11\"", "5'0\"", "5'1\"", "5'2\"", "5'3\"", "5'4\"", "5'5\"",
     "5'6\"", "5'7\"", "5'8\"", "5'9\"", "5'10\"", "5'11\"", "6'0\"", "6'1\"", "6'2\"", "6'3\"", "6'4\"", "6'5\""
   ];
-
-  religions: string[] = [
-    'All Religions',
-    'Hindu',
-    'Muslim',
-    'Sikh',
-    'Christian',
-    'Jain',
-    'Buddhist',
-    'Parsi'
-  ];
-
-  motherTongues: string[] = [
-    'All Languages',
-    'Hindi',
-    'Punjabi',
-    'Bengali',
-    'Marathi',
-    'Gujarati',
-    'Tamil',
-    'Telugu',
-    'Kannada',
-    'Malayalam',
-    'Odia',
-    'Marwari',
-    'English'
-  ];
-
-  educationOptions: string[] = [
-    'All Education Levels',
-    'Engineering / B.Tech / M.Tech',
-    'Management / MBA / PGDM',
-    'Medical / Doctor / MBBS',
-    'Finance / CA / CS / CFA',
-    'Post Graduate / Master’s',
-    'Graduate / Bachelor’s'
-  ];
-
-  professionOptions: string[] = [
-    'All Professions',
-    'Software / IT / Tech',
-    'Govt / Civil Services / PSU',
-    'Banking / Finance / Investment',
-    'Healthcare / Doctor / Medical',
-    'Business / Entrepreneur',
-    'Architecture / Design',
-    'Corporate Executive / Management'
-  ];
-
-  maritalStatuses: string[] = [
-    'All Marital Statuses',
-    'Never Married',
-    'Divorced',
-    'Widowed',
-    'Awaiting Divorce'
-  ];
-
-  incomeOptions: string[] = [
-    'No Bar',
-    '₹5 Lakhs & Above',
-    '₹10 Lakhs & Above',
-    '₹15 Lakhs & Above',
-    '₹25 Lakhs & Above',
-    '₹50 Lakhs & Above'
-  ];
-
-  popularCities: string[] = [
-    'All Cities', 'Bengaluru', 'Mumbai', 'Delhi NCR', 'Pune', 'Hyderabad',
-    'Chennai', 'Kolkata', 'Ahmedabad', 'Jaipur', 'Chandigarh'
-  ];
+  religions: string[] = ['All Religions'];
+  motherTongues: string[] = ['All Languages'];
+  educationOptions: string[] = ['All Education Levels'];
+  professionOptions: string[] = ['All Professions'];
+  maritalStatuses: string[] = ['All Marital Statuses', 'Never Married', 'Divorced', 'Widowed', 'Awaiting Divorce'];
+  incomeOptions: string[] = ['No Bar', '₹5 Lakhs & Above', '₹10 Lakhs & Above', '₹15 Lakhs & Above', '₹25 Lakhs & Above', '₹50 Lakhs & Above'];
+  popularCities: string[] = ['All Cities'];
 
   constructor(
     private searchService: SearchService,
+    private masterDataService: MasterDataService,
     private matchesService: MatchesService,
     private alertService: AlertService,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    this.loadMasterData();
     // Read query params from URL if navigated from home page quick search
     this.route.queryParams.subscribe(params => {
       if (params['lookingFor']) {
@@ -150,6 +90,21 @@ export class SearchComponent implements OnInit {
         this.filter.profileId = params['profileId'];
       }
       this.executeSearch();
+    });
+  }
+
+  loadMasterData(): void {
+    this.masterDataService.getMasterData().subscribe({
+      next: (data) => {
+        if (data) {
+          if (data.religions) this.religions = ['All Religions', ...data.religions];
+          if (data.motherTongues) this.motherTongues = ['All Languages', ...data.motherTongues];
+          if (data.educations) this.educationOptions = ['All Education Levels', ...data.educations];
+          if (data.occupations) this.professionOptions = ['All Professions', ...data.occupations];
+          if (data.locations) this.popularCities = ['All Cities', ...data.locations];
+        }
+      },
+      error: () => {}
     });
   }
 

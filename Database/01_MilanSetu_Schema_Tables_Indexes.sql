@@ -253,6 +253,104 @@ BEGIN
 END
 GO
 
+-- ----------------------------------------------------------------------------
+-- 10. TABLE: SuccessStories
+-- Description: Verified couple success stories featured on homepage & stories page
+-- ----------------------------------------------------------------------------
+IF OBJECT_ID('dbo.SuccessStories', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.SuccessStories (
+        Id INT IDENTITY(1,1) NOT NULL,
+        CoupleName NVARCHAR(150) NOT NULL,
+        WeddingDate NVARCHAR(50) NOT NULL,
+        Location NVARCHAR(150) NOT NULL,
+        ImageUrl NVARCHAR(MAX) NOT NULL,
+        Quote NVARCHAR(500) NOT NULL,
+        StorySnippet NVARCHAR(MAX) NOT NULL,
+        IsFeatured BIT NOT NULL CONSTRAINT DF_SuccessStories_IsFeatured DEFAULT (1),
+        CreatedAt DATETIME2(7) NOT NULL CONSTRAINT DF_SuccessStories_CreatedAt DEFAULT (SYSUTCDATETIME()),
+        CONSTRAINT PK_SuccessStories PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
+-- ----------------------------------------------------------------------------
+-- 11. MASTER TABLES: MasterReligions, MasterMotherTongues, MasterEducations,
+--                    MasterOccupations, MasterIncomeRanges, MasterLocations
+-- ----------------------------------------------------------------------------
+IF OBJECT_ID('dbo.MasterReligions', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.MasterReligions (
+        Id INT IDENTITY(1,1) NOT NULL,
+        Name NVARCHAR(100) NOT NULL,
+        DisplayOrder INT NOT NULL CONSTRAINT DF_MasterReligions_Order DEFAULT (0),
+        IsActive BIT NOT NULL CONSTRAINT DF_MasterReligions_Active DEFAULT (1),
+        CONSTRAINT PK_MasterReligions PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
+IF OBJECT_ID('dbo.MasterMotherTongues', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.MasterMotherTongues (
+        Id INT IDENTITY(1,1) NOT NULL,
+        Name NVARCHAR(100) NOT NULL,
+        DisplayOrder INT NOT NULL CONSTRAINT DF_MasterMotherTongues_Order DEFAULT (0),
+        IsActive BIT NOT NULL CONSTRAINT DF_MasterMotherTongues_Active DEFAULT (1),
+        CONSTRAINT PK_MasterMotherTongues PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
+IF OBJECT_ID('dbo.MasterEducations', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.MasterEducations (
+        Id INT IDENTITY(1,1) NOT NULL,
+        Name NVARCHAR(100) NOT NULL,
+        DisplayOrder INT NOT NULL CONSTRAINT DF_MasterEducations_Order DEFAULT (0),
+        IsActive BIT NOT NULL CONSTRAINT DF_MasterEducations_Active DEFAULT (1),
+        CONSTRAINT PK_MasterEducations PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
+IF OBJECT_ID('dbo.MasterOccupations', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.MasterOccupations (
+        Id INT IDENTITY(1,1) NOT NULL,
+        Name NVARCHAR(100) NOT NULL,
+        DisplayOrder INT NOT NULL CONSTRAINT DF_MasterOccupations_Order DEFAULT (0),
+        IsActive BIT NOT NULL CONSTRAINT DF_MasterOccupations_Active DEFAULT (1),
+        CONSTRAINT PK_MasterOccupations PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
+IF OBJECT_ID('dbo.MasterIncomeRanges', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.MasterIncomeRanges (
+        Id INT IDENTITY(1,1) NOT NULL,
+        RangeText NVARCHAR(100) NOT NULL,
+        DisplayOrder INT NOT NULL CONSTRAINT DF_MasterIncomeRanges_Order DEFAULT (0),
+        IsActive BIT NOT NULL CONSTRAINT DF_MasterIncomeRanges_Active DEFAULT (1),
+        CONSTRAINT PK_MasterIncomeRanges PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
+IF OBJECT_ID('dbo.MasterLocations', 'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.MasterLocations (
+        Id INT IDENTITY(1,1) NOT NULL,
+        CityName NVARCHAR(100) NOT NULL,
+        StateName NVARCHAR(100) NULL,
+        DisplayOrder INT NOT NULL CONSTRAINT DF_MasterLocations_Order DEFAULT (0),
+        IsActive BIT NOT NULL CONSTRAINT DF_MasterLocations_Active DEFAULT (1),
+        CONSTRAINT PK_MasterLocations PRIMARY KEY CLUSTERED (Id ASC)
+    );
+END
+GO
+
 -- ============================================================================
 -- PERFORMANCE & SEARCH OPTIMIZATION INDEXES
 -- ============================================================================
