@@ -13,6 +13,7 @@ namespace MilanSetu.API.Data
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<PasswordResetOtp> PasswordResetOtps { get; set; } = null!;
         public DbSet<UserProfile> UserProfiles { get; set; } = null!;
+        public DbSet<PartnerPreference> PartnerPreferences { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

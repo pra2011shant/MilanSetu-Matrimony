@@ -1,0 +1,241 @@
+<div class="pref-page">
+  <div class="container pref-container">
+
+    <!-- Header Banner -->
+    <div class="pref-header">
+      <span class="badge-pref">✨ AI Match Criteria</span>
+      <h1 class="page-title">Set Your <span class="gradient-text">Partner Preferences</span></h1>
+      <p class="page-subtitle">Define what matters most to you in your ideal life partner. These criteria are stored in your profile and used to recommend verified matches.</p>
+      
+      <!-- Preset Quick Filters -->
+      <div class="presets-wrap">
+        <span class="preset-label"><i class="bi bi-magic"></i> Quick Presets:</span>
+        <button type="button" class="btn-preset" (click)="applyPreset('traditional')">
+          <i class="bi bi-flower1"></i> Traditional & Cultured
+        </button>
+        <button type="button" class="btn-preset" (click)="applyPreset('modern')">
+          <i class="bi bi-stars"></i> Modern & Broadminded
+        </button>
+        <button type="button" class="btn-preset" (click)="applyPreset('high_income')">
+          <i class="bi bi-gem"></i> High Net-Worth / Elite
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Card -->
+    <div class="pref-card">
+
+      <!-- Top Estimator Bar -->
+      <div class="estimator-bar">
+        <div class="estimator-info">
+          <div class="est-icon"><i class="bi bi-people-fill"></i></div>
+          <div>
+            <h4>Matching Potential</h4>
+            <p>Based on your criteria, approximately <strong>{{ estimatedMatches }}+</strong> active verified profiles are available.</p>
+          </div>
+        </div>
+        <div class="est-actions">
+          <button class="btn btn-save" [disabled]="isSaving" (click)="onSave()">
+            <span *ngIf="!isSaving"><i class="bi bi-cloud-check-fill"></i> Save Preferences</span>
+            <span *ngIf="isSaving"><i class="bi bi-arrow-repeat spin"></i> Saving to Database...</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Preferences Form Grid -->
+      <div class="pref-sections-grid">
+
+        <!-- 1. AGE & HEIGHT (PHYSICAL ATTRIBUTES) -->
+        <div class="section-box">
+          <h3 class="box-title"><i class="bi bi-person-bounding-box text-primary"></i> 1. Age & Height Preferences</h3>
+          
+          <div class="form-grid-2">
+            <!-- Age Range -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-calendar-range"></i> Preferred Age Range</label>
+              <div class="range-row">
+                <select [(ngModel)]="preference.minAge" (change)="calculateEstimatedMatches()" class="form-control">
+                  <option *ngFor="let a of ageOptions" [value]="a">{{ a }} Yrs</option>
+                </select>
+                <span class="to-text">to</span>
+                <select [(ngModel)]="preference.maxAge" (change)="calculateEstimatedMatches()" class="form-control">
+                  <option *ngFor="let a of ageOptions" [value]="a" [disabled]="a < preference.minAge">{{ a }} Yrs</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Height Range -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-arrows-expand"></i> Preferred Height Range</label>
+              <div class="range-row">
+                <select [(ngModel)]="preference.minHeight" class="form-control">
+                  <option *ngFor="let h of heightOptions" [value]="h">{{ h }}</option>
+                </select>
+                <span class="to-text">to</span>
+                <select [(ngModel)]="preference.maxHeight" class="form-control">
+                  <option *ngFor="let h of heightOptions" [value]="h">{{ h }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. RELIGION, COMMUNITY & MOTHER TONGUE -->
+        <div class="section-box">
+          <h3 class="box-title"><i class="bi bi-brightness-high-fill text-primary"></i> 2. Religion, Community & Language</h3>
+          
+          <div class="form-grid-3">
+            <!-- Religion -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-star"></i> Religion</label>
+              <select [(ngModel)]="preference.religion" (change)="calculateEstimatedMatches()" class="form-control">
+                <option *ngFor="let r of religions" [value]="r">{{ r }}</option>
+              </select>
+            </div>
+
+            <!-- Community / Caste -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-people"></i> Community / Caste</label>
+              <input
+                type="text"
+                [(ngModel)]="preference.community"
+                placeholder="e.g. Brahmin, Rajput, or Open to all"
+                class="form-control"
+              />
+            </div>
+
+            <!-- Mother Tongue -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-translate"></i> Mother Tongue</label>
+              <select [(ngModel)]="preference.motherTongue" (change)="calculateEstimatedMatches()" class="form-control">
+                <option *ngFor="let m of motherTongues" [value]="m">{{ m }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. EDUCATION, PROFESSION & INCOME -->
+        <div class="section-box">
+          <h3 class="box-title"><i class="bi bi-briefcase-fill text-primary"></i> 3. Education, Career & Income</h3>
+          
+          <div class="form-grid-3">
+            <!-- Education -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-mortarboard"></i> Minimum Education</label>
+              <select [(ngModel)]="preference.education" class="form-control">
+                <option *ngFor="let e of educationOptions" [value]="e">{{ e }}</option>
+              </select>
+            </div>
+
+            <!-- Profession -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-laptop"></i> Profession Sector</label>
+              <select [(ngModel)]="preference.profession" class="form-control">
+                <option *ngFor="let p of professionOptions" [value]="p">{{ p }}</option>
+              </select>
+            </div>
+
+            <!-- Income -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-currency-rupee"></i> Minimum Annual Income</label>
+              <select [(ngModel)]="preference.minAnnualIncome" (change)="calculateEstimatedMatches()" class="form-control">
+                <option *ngFor="let inc of incomeOptions" [value]="inc">{{ inc }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. LOCATION & MARITAL STATUS -->
+        <div class="section-box">
+          <h3 class="box-title"><i class="bi bi-geo-alt-fill text-primary"></i> 4. Location & Marital Status</h3>
+          
+          <div class="form-grid-2">
+            <!-- Location -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-pin-map"></i> Preferred Location / Cities</label>
+              <input
+                type="text"
+                [(ngModel)]="preference.preferredLocation"
+                placeholder="e.g. Mumbai, Pune, Delhi NCR, or Open to all"
+                class="form-control"
+              />
+              <div class="city-quick-pills">
+                <span
+                  class="city-chip"
+                  *ngFor="let c of popularCities"
+                  (click)="preference.preferredLocation = c"
+                  [class.active]="preference.preferredLocation === c"
+                >
+                  {{ c }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Marital Status -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-heart"></i> Marital Status</label>
+              <select [(ngModel)]="preference.maritalStatus" (change)="calculateEstimatedMatches()" class="form-control">
+                <option *ngFor="let ms of maritalStatuses" [value]="ms">{{ ms }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. LIFESTYLE (DIET, DRINKING, SMOKING) -->
+        <div class="section-box">
+          <h3 class="box-title"><i class="bi bi-cup-hot-fill text-primary"></i> 5. Lifestyle & Habits</h3>
+          
+          <div class="form-grid-3">
+            <!-- Diet -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-egg-fried"></i> Food Habits / Diet</label>
+              <select [(ngModel)]="preference.diet" class="form-control">
+                <option *ngFor="let d of dietOptions" [value]="d">{{ d }}</option>
+              </select>
+            </div>
+
+            <!-- Drink -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-cup-straw"></i> Drinking Habits</label>
+              <select [(ngModel)]="preference.drink" class="form-control">
+                <option *ngFor="let dr of drinkOptions" [value]="dr">{{ dr }}</option>
+              </select>
+            </div>
+
+            <!-- Smoke -->
+            <div class="form-group">
+              <label class="form-label"><i class="bi bi-ban"></i> Smoking Habits</label>
+              <select [(ngModel)]="preference.smoke" class="form-control">
+                <option *ngFor="let sm of smokeOptions" [value]="sm">{{ sm }}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Save Action Bar -->
+      <div class="pref-footer-bar">
+        <div class="footer-note">
+          <i class="bi bi-shield-lock-fill text-primary"></i>
+          <span>Preferences are securely saved in your database profile. You can update them anytime.</span>
+        </div>
+        
+        <div class="action-buttons">
+          <a routerLink="/" class="btn btn-outline"><i class="bi bi-house"></i> Home</a>
+          <button class="btn btn-primary btn-glow" [disabled]="isSaving" (click)="onSave()">
+            <i class="bi bi-check2-circle"></i> Save Preferences
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-popup" *ngIf="toastMessage">
+    <i class="bi bi-bell-fill"></i>
+    <span>{{ toastMessage }}</span>
+  </div>
+</div>

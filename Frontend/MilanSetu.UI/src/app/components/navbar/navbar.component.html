@@ -30,9 +30,9 @@
       <ul class="nav-links">
         <li><a routerLink="/" fragment="home" class="active"><i class="bi bi-house-door"></i> Home</a></li>
         <li><a routerLink="/" fragment="search"><i class="bi bi-search-heart"></i> Search</a></li>
-        <li><a routerLink="/" fragment="featured"><i class="bi bi-stars"></i> Featured Profiles</a></li>
+        <li><a routerLink="/partner-preference"><i class="bi bi-sliders text-primary"></i> Partner Preference</a></li>
         <li><a routerLink="/" fragment="stories"><i class="bi bi-chat-heart"></i> Success Stories</a></li>
-        <li><a routerLink="/my-profile"><i class="bi bi-person-circle text-primary"></i> My Profile</a></li>
+        <li><a routerLink="/my-profile"><i class="bi bi-person-circle"></i> My Profile</a></li>
       </ul>
 
       <!-- Auth Action Buttons (Dynamic based on login status) -->
@@ -67,19 +67,25 @@
     <div class="mobile-menu" [class.open]="isMenuOpen">
       <ul class="mobile-nav-links">
         <li><a routerLink="/" (click)="toggleMenu()"><i class="bi bi-house-door"></i> Home</a></li>
-        <li><a routerLink="/" fragment="search" (click)="toggleMenu()"><i class="bi bi-search-heart"></i> Search Matches</a></li>
-        <li><a routerLink="/" fragment="featured" (click)="toggleMenu()"><i class="bi bi-stars"></i> Featured Profiles</a></li>
-        <li><a routerLink="/" fragment="stories" (click)="toggleMenu()"><i class="bi bi-chat-heart"></i> Success Stories</a></li>
+        <li><a routerLink="/" fragment="search" (click)="toggleMenu()"><i class="bi bi-search-heart"></i> Search
+            Matches</a></li>
+        <li><a routerLink="/" fragment="featured" (click)="toggleMenu()"><i class="bi bi-stars"></i> Featured
+            Profiles</a></li>
+        <li><a routerLink="/" fragment="stories" (click)="toggleMenu()"><i class="bi bi-chat-heart"></i> Success
+            Stories</a></li>
         <li><a routerLink="/register" (click)="toggleMenu()"><i class="bi bi-person-plus"></i> Register</a></li>
       </ul>
       <div class="mobile-actions" *ngIf="!(authService.currentUser$ | async); else mobileLoggedInTpl">
-        <a routerLink="/login" (click)="toggleMenu()" class="btn btn-outline w-100 mb-2"><i class="bi bi-box-arrow-in-right"></i> Login</a>
-        <a routerLink="/register" (click)="toggleMenu()" class="btn btn-primary w-100"><i class="bi bi-person-plus-fill"></i> Register Free</a>
+        <a routerLink="/login" (click)="toggleMenu()" class="btn btn-outline w-100 mb-2"><i
+            class="bi bi-box-arrow-in-right"></i> Login</a>
+        <a routerLink="/register" (click)="toggleMenu()" class="btn btn-primary w-100"><i
+            class="bi bi-person-plus-fill"></i> Register Free</a>
       </div>
       <ng-template #mobileLoggedInTpl>
         <div class="mobile-actions" *ngIf="authService.currentUser$ | async as user">
           <p class="mb-2 font-bold"><i class="bi bi-person-circle"></i> Logged in as: {{ user.name }}</p>
-          <button (click)="logout(); toggleMenu()" class="btn btn-outline w-100"><i class="bi bi-box-arrow-right"></i> Logout</button>
+          <button (click)="logout(); toggleMenu()" class="btn btn-outline w-100"><i class="bi bi-box-arrow-right"></i>
+            Logout</button>
         </div>
       </ng-template>
     </div>
