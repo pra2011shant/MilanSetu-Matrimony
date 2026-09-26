@@ -373,5 +373,146 @@ BEGIN
 END;
 GO
 
+-- ----------------------------------------------------------------------------
+-- 9. SP: sp_GetSuccessStories
+-- Description: Fetches all featured couple success stories
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER PROCEDURE dbo.sp_GetSuccessStories
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        Id,
+        CoupleName,
+        WeddingDate,
+        Location,
+        ImageUrl,
+        Quote,
+        StorySnippet,
+        IsFeatured,
+        CreatedAt
+    FROM dbo.SuccessStories
+    WHERE IsFeatured = 1
+    ORDER BY CreatedAt DESC;
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- 10. SP: sp_RecordProfileView
+-- Description: Records a profile view event and creates notification for the viewed member
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER PROCEDURE dbo.sp_RecordProfileView
+    @ViewerUserId INT,
+    @ViewedUserId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF @ViewerUserId = @ViewedUserId RETURN;
+
+    -- Insert Profile View log
+    INSERT INTO dbo.ProfileViews (ViewerUserId, ViewedUserId, ViewedAt)
+    VALUES (@ViewerUserId, @ViewedUserId, SYSUTCDATETIME());
+
+    -- Create Notification with Matrimony ID
+    DECLARE @ViewerName NVARCHAR(100);
+    DECLARE @ViewerAvatar NVARCHAR(MAX);
+    SELECT @ViewerName = Name, @ViewerAvatar = ProfilePhotoUrl FROM dbo.Users WHERE Id = @ViewerUserId;
+
+    INSERT INTO dbo.Notifications (UserId, Type, Title, Message, ActionUrl, AvatarUrl, IsRead, CreatedAt)
+    VALUES (
+        @ViewedUserId,
+        'ProfileView',
+        '👀 Profile Viewed!',
+        'Member MS-' + CAST(@ViewerUserId AS NVARCHAR(20)) + ' (' + @ViewerName + ') just viewed your profile.',
+        '/search?id=' + CAST(@ViewerUserId AS NVARCHAR(20)),
+        @ViewerAvatar,
+        0,
+        SYSUTCDATETIME()
+    );
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- 11. SP: sp_GetNotifications
+-- Description: Retrieves user notifications ordered by newest first
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER PROCEDURE dbo.sp_GetNotifications
+    @UserId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        Id,
+        UserId,
+        Type,
+        Title,
+        Message,
+        ActionUrl,
+        AvatarUrl,
+        IsRead,
+        CreatedAt
+    FROM dbo.Notifications
+    WHERE UserId = @UserId
+    ORDER BY CreatedAt DESC;
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- 12. SP: sp_SavePasswordResetOtp
+-- Description: Stores 6-digit OTP code for password recovery
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER PROCEDURE dbo.sp_SavePasswordResetOtp
+    @Identifier NVARCHAR(150),
+    @OtpCode NVARCHAR(6),
+    @ExpiresAt DATETIME2
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Invalidate existing OTPs for identifier
+    UPDATE dbo.PasswordResetOtps
+    SET IsUsed = 1
+    WHERE Identifier = @Identifier AND IsUsed = 0;
+
+    INSERT INTO dbo.PasswordResetOtps (Identifier, OtpCode, ExpiresAt, IsUsed, CreatedAt)
+    VALUES (@Identifier, @OtpCode, @ExpiresAt, 0, SYSUTCDATETIME());
+END;
+GO
+
+-- ----------------------------------------------------------------------------
+-- 13. SP: sp_VerifyPasswordResetOtp
+-- Description: Validates entered OTP code
+-- ----------------------------------------------------------------------------
+CREATE OR ALTER PROCEDURE dbo.sp_VerifyPasswordResetOtp
+    @Identifier NVARCHAR(150),
+    @OtpCode NVARCHAR(6),
+    @IsValid BIT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (
+        SELECT 1 FROM dbo.PasswordResetOtps
+        WHERE Identifier = @Identifier 
+          AND OtpCode = @OtpCode 
+          AND IsUsed = 0 
+          AND ExpiresAt > SYSUTCDATETIME()
+    )
+    BEGIN
+        SET @IsValid = 1;
+        UPDATE dbo.PasswordResetOtps
+        SET IsUsed = 1
+        WHERE Identifier = @Identifier AND OtpCode = @OtpCode;
+    END
+    ELSE
+    BEGIN
+        SET @IsValid = 0;
+    END
+END;
+GO
+
 PRINT '>>> All MilanSetu Stored Procedures Compiled Successfully! <<<';
 GO
