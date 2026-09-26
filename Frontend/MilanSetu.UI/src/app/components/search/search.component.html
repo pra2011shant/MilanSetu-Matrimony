@@ -1,0 +1,382 @@
+<div class="search-page">
+  <div class="container search-container">
+
+    <!-- Top Breadcrumb / Title Bar -->
+    <div class="search-header-strip">
+      <div class="header-titles">
+        <h1><i class="bi bi-search-heart text-primary"></i> Advanced Profile Search</h1>
+        <p>Find matches tailored to your exact criteria across 50,000+ verified profiles.</p>
+      </div>
+      <div class="id-search-box">
+        <label><i class="bi bi-person-badge"></i> Search by Profile ID</label>
+        <div class="id-input-wrap">
+          <input
+            type="text"
+            [(ngModel)]="filter.profileId"
+            placeholder="e.g. MS-101"
+            class="form-control id-input"
+          />
+          <button class="btn btn-primary btn-sm" (click)="executeSearch()">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main 2-Column Search Layout -->
+    <div class="search-layout">
+      
+      <!-- ===================================================================== -->
+      <!-- LEFT SIDEBAR: ADVANCED SEARCH FILTERS                                 -->
+      <!-- ===================================================================== -->
+      <aside class="filters-sidebar">
+        <div class="filters-card">
+          <div class="filter-header">
+            <h3><i class="bi bi-sliders2 text-primary"></i> Search Filters</h3>
+            <button class="btn-reset" (click)="resetFilters()"><i class="bi bi-arrow-counterclockwise"></i> Reset</button>
+          </div>
+
+          <form (ngSubmit)="executeSearch()" class="filters-form">
+            <!-- 1. Gender -->
+            <div class="filter-group">
+              <label class="filter-label"><i class="bi bi-gender-ambiguous"></i> I am looking for</label>
+              <div class="gender-pill-toggle">
+                <button
+                  type="button"
+                  class="toggle-btn"
+                  [class.active]="filter.gender === 'Bride'"
+                  (click)="filter.gender = 'Bride'; executeSearch()"
+                >
+                  <i class="bi bi-gender-female"></i> Bride
+                </button>
+                <button
+                  type="button"
+                  class="toggle-btn"
+                  [class.active]="filter.gender === 'Groom'"
+                  (click)="filter.gender = 'Groom'; executeSearch()"
+                >
+                  <i class="bi bi-gender-male"></i> Groom
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Age Range -->
+            <div class="filter-group">
+              <label class="filter-label"><i class="bi bi-calendar3"></i> Age Range</label>
+              <div class="range-inputs">
+                <select [(ngModel)]="filter.minAge" name="minAge" class="form-control range-select">
+                  <option *ngFor="let a of ageOptions" [value]="a">{{ a }} Yrs</option>
+                </select>
+                <span class="range-to">to</span>
+                <select [(ngModel)]="filter.maxAge" name="maxAge" class="form-control range-select">
+                  <option *ngFor="let a of ageOptions" [value]="a" [disabled]="a < (filter.minAge || 18)">{{ a }} Yrs</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 3. Height Range -->
+            <div class="filter-group">
+              <label class="filter-label"><i class="bi bi-arrows-expand"></i> Height Range</label>
+              <div class="range-inputs">
+                <select [(ngModel)]="filter.minHeight" name="minHeight" class="form-control range-select">
+                  <option *ngFor="let h of heightOptions" [value]="h">{{ h }}</option>
+                </select>
+                <span class="range-to">to</span>
+                <select [(ngModel)]="filter.maxHeight" name="maxHeight" class="form-control range-select">
+                  <option *ngFor="let h of heightOptions" [value]="h">{{ h }}</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- 4. Religion -->
+            <div class="filter-group">
+              <label class="filter-label"><i class="bi bi-star"></i> Religion</label>
+              <select [(ngModel)]="filter.religion" name="religion" class="form-control">
+                <option *ngFor="let r of religions" [value]="r">{{ r }}</option>
+              </select>
+            </div>
+
+            <!-- 5. Community / Caste -->
+            <div class="filter-group">
+              <label class="filter-label"><i class="bi bi-people"></i> Caste / Community</label>
+              <input
+                type="text"
+                [(ngModel)]="filter.community"
+                name="community"
+                placeholder="e.g. Brahmin, Rajput, or Caste No Bar"
+                class="form-control"
+              />
+            </div>
+
+            <!-- 6. Mother Tongue -->
+            <div class="filter-group">
+              <label class="filter-label"><i class="bi bi-translate"></i> Mother Tongue</label>
+              <select [(ngModel)]="filter.motherTongue" name="motherTongue" class="form-control">
+                <option *ngFor="let m of motherTongues" [value]="m">{{ m }}</option>
+              </select>
+            </div>
+
+            <!-- 7. City / Location -->
+            <div class="filter-group">
+              <label class="filter-label"><i class="bi bi-geo-alt"></i> City / Location</label>
+              <select [(ngModel)]="filter.city" name="city" class="form-control">
+                <option *ngFor="let c of popularCities" [value]="c">{{ c }}</option>
+              </select>
+            </div>
+
+            <!-- 8. Education -->
+            <div class="filter-group">
+              <label class="filter-label"><i class="bi bi-mortarboard"></i> Education Level</label>
+              <select [(ngModel)]="filter.education" name="education" class="form-control">
+                <option *ngFor="let e of educationOptions" [value]="e">{{ e }}</option>
+              </select>
+            </div>
+
+            <!-- 9. Profession -->
+            <div class="filter-group">
+              <label class="filter-label"><i class="bi bi-briefcase"></i> Profession Sector</label>
+              <select [(ngModel)]="filter.profession" name="profession" class="form-control">
+                <option *ngFor="let p of professionOptions" [value]="p">{{ p }}</option>
+              </select>
+            </div>
+
+            <!-- 10. Marital Status -->
+            <div class="filter-group">
+              <label class="filter-label"><i class="bi bi-heart"></i> Marital Status</label>
+              <select [(ngModel)]="filter.maritalStatus" name="maritalStatus" class="form-control">
+                <option *ngFor="let ms of maritalStatuses" [value]="ms">{{ ms }}</option>
+              </select>
+            </div>
+
+            <!-- 11. Income -->
+            <div class="filter-group">
+              <label class="filter-label"><i class="bi bi-currency-rupee"></i> Minimum Income</label>
+              <select [(ngModel)]="filter.minIncome" name="minIncome" class="form-control">
+                <option *ngFor="let inc of incomeOptions" [value]="inc">{{ inc }}</option>
+              </select>
+            </div>
+
+            <!-- Filter Apply Button -->
+            <button type="submit" class="btn btn-primary btn-apply w-100">
+              <i class="bi bi-search"></i> Apply Filters
+            </button>
+          </form>
+        </div>
+      </aside>
+
+      <!-- ===================================================================== -->
+      <!-- RIGHT RESULTS: SEARCH RESULTS GRID / LIST                             -->
+      <!-- ===================================================================== -->
+      <main class="results-area">
+        
+        <!-- Results Bar: Count & Sorting -->
+        <div class="results-toolbar">
+          <div class="results-count">
+            <h4>Showing <span>{{ profiles.length }}</span> Matching Profiles</h4>
+            <p *ngIf="filter.gender">Filtered for: <strong>{{ filter.gender }}</strong> in <strong>{{ filter.religion }}</strong></p>
+          </div>
+
+          <div class="toolbar-controls">
+            <!-- Sort By -->
+            <div class="sort-control">
+              <label><i class="bi bi-arrow-down-up"></i> Sort By:</label>
+              <select [(ngModel)]="filter.sortBy" (change)="onSortChange()" class="form-control sort-select">
+                <option value="relevance">Most Relevant</option>
+                <option value="age_asc">Age (Low to High)</option>
+                <option value="age_desc">Age (High to Low)</option>
+                <option value="income_desc">Annual Income (High to Low)</option>
+              </select>
+            </div>
+
+            <!-- View Toggle -->
+            <div class="view-toggle">
+              <button class="btn-toggle-view" [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'" title="Grid View">
+                <i class="bi bi-grid-fill"></i>
+              </button>
+              <button class="btn-toggle-view" [class.active]="viewMode === 'list'" (click)="viewMode = 'list'" title="List View">
+                <i class="bi bi-list-task"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profiles List / Grid -->
+        <div [ngClass]="viewMode === 'grid' ? 'search-grid-view' : 'search-list-view'" *ngIf="profiles.length > 0; else noMatchesTpl">
+          
+          <div class="match-card" *ngFor="let profile of profiles" (click)="openDetailModal(profile)">
+            
+            <!-- Photo & Badges -->
+            <div class="card-img-wrap">
+              <img [src]="profile.imageUrl" [alt]="profile.name" class="card-img" loading="lazy" />
+              
+              <div class="badge-top-left" *ngIf="profile.premium">
+                <span class="premium-chip"><i class="bi bi-gem"></i> Premium</span>
+              </div>
+
+              <div class="badge-top-right" *ngIf="profile.verified">
+                <span class="verified-chip"><i class="bi bi-patch-check-fill"></i> Verified</span>
+              </div>
+
+              <button
+                class="btn-shortlist"
+                [class.shortlisted]="profile.isShortlisted"
+                (click)="toggleShortlist(profile, $event)"
+                title="Shortlist Profile"
+              >
+                <i class="bi" [ngClass]="profile.isShortlisted ? 'bi-star-fill' : 'bi-star'"></i>
+              </button>
+
+              <div class="card-id-pill">{{ profile.profileId }}</div>
+            </div>
+
+            <!-- Profile Info Body -->
+            <div class="card-content">
+              <div class="card-head">
+                <h3 class="name">{{ profile.name }}</h3>
+                <span class="age-height">{{ profile.age }} Yrs, {{ profile.height }}</span>
+              </div>
+
+              <div class="meta-row">
+                <span class="pill-chip"><i class="bi bi-people-fill"></i> {{ profile.religion }} - {{ profile.caste }}</span>
+                <span class="pill-chip"><i class="bi bi-translate"></i> {{ profile.motherTongue }}</span>
+                <span class="pill-chip"><i class="bi bi-heart"></i> {{ profile.maritalStatus }}</span>
+              </div>
+
+              <div class="details-list">
+                <div class="d-item">
+                  <i class="bi bi-briefcase-fill"></i>
+                  <span>{{ profile.profession }} <strong *ngIf="profile.company">at {{ profile.company }}</strong></span>
+                </div>
+                <div class="d-item">
+                  <i class="bi bi-mortarboard-fill"></i>
+                  <span>{{ profile.education }}</span>
+                </div>
+                <div class="d-item">
+                  <i class="bi bi-cash-stack"></i>
+                  <span>{{ profile.annualIncome }}</span>
+                </div>
+                <div class="d-item">
+                  <i class="bi bi-geo-alt-fill"></i>
+                  <span>{{ profile.location }}</span>
+                </div>
+              </div>
+
+              <p class="about-snippet">"{{ profile.about }}"</p>
+
+              <!-- Action Buttons -->
+              <div class="card-actions">
+                <button
+                  class="btn btn-connect"
+                  [class.connected]="profile.interestSent"
+                  (click)="sendInterest(profile, $event)"
+                >
+                  <i class="bi" [ngClass]="profile.interestSent ? 'bi-check-circle-fill' : 'bi-heart-fill'"></i>
+                  {{ profile.interestSent ? 'Interest Sent' : 'Send Interest' }}
+                </button>
+                <button class="btn btn-view" (click)="openDetailModal(profile)">
+                  <i class="bi bi-eye"></i> View Profile
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- No Matches Template -->
+        <ng-template #noMatchesTpl>
+          <div class="no-matches-card">
+            <i class="bi bi-search-heart text-muted"></i>
+            <h3>No matching profiles found</h3>
+            <p>Try widening your age, religion, or location criteria to see more verified members.</p>
+            <button class="btn btn-primary mt-3" (click)="resetFilters()"><i class="bi bi-arrow-counterclockwise"></i> Reset Filters</button>
+          </div>
+        </ng-template>
+
+      </main>
+
+    </div>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- PROFILE DETAILS MODAL                                                     -->
+  <!-- ========================================================================= -->
+  <div class="modal-backdrop" *ngIf="selectedProfile" (click)="closeDetailModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <button class="modal-close-btn" (click)="closeDetailModal()"><i class="bi bi-x-lg"></i></button>
+
+      <div class="modal-profile-header">
+        <div class="modal-avatar-wrap">
+          <img [src]="selectedProfile.imageUrl" [alt]="selectedProfile.name" class="modal-avatar" />
+          <span class="modal-verified" *ngIf="selectedProfile.verified"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        </div>
+        <div class="modal-header-info">
+          <h2>{{ selectedProfile.name }}</h2>
+          <span class="modal-id">Profile ID: {{ selectedProfile.profileId }}</span>
+          <div class="modal-badges">
+            <span class="badge-tag">{{ selectedProfile.age }} Yrs, {{ selectedProfile.height }}</span>
+            <span class="badge-tag">{{ selectedProfile.religion }} • {{ selectedProfile.motherTongue }}</span>
+            <span class="badge-tag badge-premium" *ngIf="selectedProfile.premium"><i class="bi bi-gem"></i> Premium</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-section">
+          <h4><i class="bi bi-person-lines-fill text-primary"></i> About Me</h4>
+          <p>{{ selectedProfile.about }}</p>
+        </div>
+
+        <div class="modal-section-grid">
+          <div class="info-block">
+            <span class="label">Profession</span>
+            <span class="val">{{ selectedProfile.profession }}</span>
+          </div>
+          <div class="info-block">
+            <span class="label">Company</span>
+            <span class="val">{{ selectedProfile.company || 'Not Specified' }}</span>
+          </div>
+          <div class="info-block">
+            <span class="label">Education</span>
+            <span class="val">{{ selectedProfile.education }}</span>
+          </div>
+          <div class="info-block">
+            <span class="label">Annual Income</span>
+            <span class="val text-success font-bold">{{ selectedProfile.annualIncome }}</span>
+          </div>
+          <div class="info-block">
+            <span class="label">Location</span>
+            <span class="val">{{ selectedProfile.location }}</span>
+          </div>
+          <div class="info-block">
+            <span class="label">Marital Status</span>
+            <span class="val">{{ selectedProfile.maritalStatus }}</span>
+          </div>
+          <div class="info-block">
+            <span class="label">Community / Caste</span>
+            <span class="val">{{ selectedProfile.caste || 'Open to all' }}</span>
+          </div>
+          <div class="info-block">
+            <span class="label">Verification</span>
+            <span class="val text-success"><i class="bi bi-shield-fill-check"></i> 100% ID Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" (click)="closeDetailModal()">Close</button>
+        <button class="btn btn-primary" (click)="sendInterest(selectedProfile, $event)">
+          <i class="bi" [ngClass]="selectedProfile.interestSent ? 'bi-check-circle-fill' : 'bi-heart-fill'"></i>
+          {{ selectedProfile.interestSent ? 'Interest Sent' : 'Send Interest & Connect' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-popup" *ngIf="toastMessage">
+    <i class="bi bi-bell-fill"></i>
+    <span>{{ toastMessage }}</span>
+  </div>
+</div>

@@ -53,5 +53,8 @@ namespace MilanSetu.API.Models
         public bool IsVerified { get; set; } = true;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public virtual ICollection<UserProfile> UserProfiles { get; set; } = new List<UserProfile>();
+        public virtual ICollection<PartnerPreference> PartnerPreferences { get; set; } = new List<PartnerPreference>();
     }
 }

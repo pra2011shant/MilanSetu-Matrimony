@@ -28,8 +28,8 @@
 
       <!-- Desktop Nav Menu -->
       <ul class="nav-links">
-        <li><a routerLink="/" fragment="home" class="active"><i class="bi bi-house-door"></i> Home</a></li>
-        <li><a routerLink="/" fragment="search"><i class="bi bi-search-heart"></i> Search</a></li>
+        <li><a routerLink="/" class="active"><i class="bi bi-house-door"></i> Home</a></li>
+        <li><a routerLink="/search"><i class="bi bi-search-heart"></i> Search</a></li>
         <li><a routerLink="/partner-preference"><i class="bi bi-sliders text-primary"></i> Partner Preference</a></li>
         <li><a routerLink="/" fragment="stories"><i class="bi bi-chat-heart"></i> Success Stories</a></li>
         <li><a routerLink="/my-profile"><i class="bi bi-person-circle"></i> My Profile</a></li>
@@ -67,7 +67,7 @@
     <div class="mobile-menu" [class.open]="isMenuOpen">
       <ul class="mobile-nav-links">
         <li><a routerLink="/" (click)="toggleMenu()"><i class="bi bi-house-door"></i> Home</a></li>
-        <li><a routerLink="/" fragment="search" (click)="toggleMenu()"><i class="bi bi-search-heart"></i> Search
+        <li><a routerLink="/search" (click)="toggleMenu()"><i class="bi bi-search-heart"></i> Search
             Matches</a></li>
         <li><a routerLink="/" fragment="featured" (click)="toggleMenu()"><i class="bi bi-stars"></i> Featured
             Profiles</a></li>
