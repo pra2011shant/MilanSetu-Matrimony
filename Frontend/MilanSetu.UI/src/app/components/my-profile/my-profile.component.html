@@ -1,0 +1,473 @@
+<div class="profile-page">
+  <div class="container profile-container">
+
+    <!-- ========================================================================= -->
+    <!-- 1. TOP PROFILE HEADER & COMPLETION CARD                                   -->
+    <!-- ========================================================================= -->
+    <div class="profile-hero-card">
+      <div class="profile-hero-main">
+        <div class="avatar-wrapper">
+          <img [src]="profile.profilePhotoUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80'" [alt]="profile.name" class="profile-avatar" />
+          <span class="verified-tag" *ngIf="profile.isVerified"><i class="bi bi-patch-check-fill"></i> Verified</span>
+        </div>
+
+        <div class="hero-info">
+          <div class="name-row">
+            <h2>{{ profile.name }}</h2>
+            <span class="id-pill">ID: MS-{{ profile.userId ? '10' + profile.userId : '101' }}</span>
+          </div>
+          <p class="hero-subtitle">
+            <span><i class="bi bi-gender-ambiguous"></i> {{ profile.gender }}</span> • 
+            <span><i class="bi bi-calendar3"></i> {{ profile.age }} Yrs, {{ profile.height }}</span> • 
+            <span><i class="bi bi-geo-alt"></i> {{ profile.city }}, {{ profile.state }}</span>
+          </p>
+          <div class="hero-tags">
+            <span class="tag-pill"><i class="bi bi-briefcase"></i> {{ profile.occupation }}</span>
+            <span class="tag-pill"><i class="bi bi-mortarboard"></i> {{ profile.highestEducation }}</span>
+            <span class="tag-pill"><i class="bi bi-cash-stack"></i> {{ profile.annualIncome }}</span>
+            <span class="tag-pill"><i class="bi bi-star"></i> {{ profile.religion }} - {{ profile.caste }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Completion Progress Box -->
+      <div class="completion-box">
+        <div class="progress-circle">
+          <span class="percentage">{{ profile.profileCompletionPercentage }}%</span>
+          <span class="score-label">Complete</span>
+        </div>
+        <div class="completion-details">
+          <h4>Profile Score</h4>
+          <p>Profiles with 90%+ completion get 4x more responses from verified families!</p>
+          <button class="btn btn-preview" (click)="isPreviewMode = !isPreviewMode">
+            <i class="bi" [ngClass]="isPreviewMode ? 'bi-pencil-square' : 'bi-eye-fill'"></i>
+            {{ isPreviewMode ? 'Edit My Profile' : 'Preview As Others See' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Layout Grid -->
+    <div class="profile-layout-grid">
+      
+      <!-- ========================================================================= -->
+      <!-- LEFT SIDEBAR: SECTION NAVIGATION TABS                                     -->
+      <!-- ========================================================================= -->
+      <aside class="profile-sidebar" *ngIf="!isPreviewMode">
+        <div class="sidebar-card">
+          <h4 class="sidebar-title"><i class="bi bi-list-stars text-primary"></i> Profile Sections</h4>
+          <ul class="section-nav-list">
+            <li [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">
+              <i class="bi bi-grid-fill"></i> View All Sections
+            </li>
+            <li [class.active]="activeTab === 'basic'" (click)="activeTab = 'basic'">
+              <i class="bi bi-person-lines-fill"></i> 1. Basic Information
+            </li>
+            <li [class.active]="activeTab === 'about'" (click)="activeTab = 'about'">
+              <i class="bi bi-chat-square-quote-fill"></i> 2. About Me
+            </li>
+            <li [class.active]="activeTab === 'education'" (click)="activeTab = 'education'">
+              <i class="bi bi-mortarboard-fill"></i> 3. Education
+            </li>
+            <li [class.active]="activeTab === 'profession'" (click)="activeTab = 'profession'">
+              <i class="bi bi-briefcase-fill"></i> 4. Profession
+            </li>
+            <li [class.active]="activeTab === 'income'" (click)="activeTab = 'income'">
+              <i class="bi bi-currency-rupee"></i> 5. Income
+            </li>
+            <li [class.active]="activeTab === 'family'" (click)="activeTab = 'family'">
+              <i class="bi bi-people-fill"></i> 6. Family Details
+            </li>
+            <li [class.active]="activeTab === 'lifestyle'" (click)="activeTab = 'lifestyle'">
+              <i class="bi bi-cup-hot-fill"></i> 7. Lifestyle
+            </li>
+            <li [class.active]="activeTab === 'hobbies'" (click)="activeTab = 'hobbies'">
+              <i class="bi bi-controller"></i> 8. Hobbies
+            </li>
+            <li [class.active]="activeTab === 'religion'" (click)="activeTab = 'religion'">
+              <i class="bi bi-brightness-high-fill"></i> 9. Religion & Astro
+            </li>
+            <li [class.active]="activeTab === 'location'" (click)="activeTab = 'location'">
+              <i class="bi bi-geo-alt-fill"></i> 10. Location
+            </li>
+            <li [class.active]="activeTab === 'photos'" (click)="activeTab = 'photos'">
+              <i class="bi bi-images"></i> 11. Photos ({{ profile.photoGallery.length }})
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- ========================================================================= -->
+      <!-- MAIN CONTENT: 11 SECTIONS CARDS                                           -->
+      <!-- ========================================================================= -->
+      <main class="profile-content-area" [class.full-width]="isPreviewMode">
+
+        <!-- 1. BASIC INFORMATION SECTION -->
+        <section class="section-card" id="basic" *ngIf="activeTab === 'all' || activeTab === 'basic'">
+          <div class="card-header">
+            <h3><i class="bi bi-person-lines-fill text-primary"></i> 1. Basic Information</h3>
+            <button class="btn-edit" *ngIf="!isPreviewMode" (click)="editState['basic'] ? saveSection('basic') : toggleEdit('basic')">
+              <i class="bi" [ngClass]="editState['basic'] ? 'bi-check-lg' : 'bi-pencil'"></i>
+              {{ editState['basic'] ? 'Save Changes' : 'Edit' }}
+            </button>
+          </div>
+
+          <!-- Display Mode -->
+          <div class="info-grid" *ngIf="!editState['basic']">
+            <div class="info-cell"><span class="k">Full Name</span><span class="v">{{ profile.name }}</span></div>
+            <div class="info-cell"><span class="k">Gender</span><span class="v">{{ profile.gender }}</span></div>
+            <div class="info-cell"><span class="k">Date of Birth & Age</span><span class="v">{{ profile.dateOfBirth }} ({{ profile.age }} Yrs)</span></div>
+            <div class="info-cell"><span class="k">Height</span><span class="v">{{ profile.height }}</span></div>
+            <div class="info-cell"><span class="k">Weight</span><span class="v">{{ profile.weight }}</span></div>
+            <div class="info-cell"><span class="k">Marital Status</span><span class="v">{{ profile.maritalStatus }}</span></div>
+            <div class="info-cell"><span class="k">Physical Status</span><span class="v">{{ profile.physicalStatus }}</span></div>
+            <div class="info-cell"><span class="k">Profile Managed By</span><span class="v">{{ profile.profileManagedBy }}</span></div>
+          </div>
+
+          <!-- Edit Mode -->
+          <div class="edit-grid" *ngIf="editState['basic']">
+            <div class="form-group"><label>Full Name</label><input type="text" [(ngModel)]="profile.name" class="form-control" /></div>
+            <div class="form-group"><label>Height</label>
+              <select [(ngModel)]="profile.height" class="form-control"><option *ngFor="let h of heightOptions" [value]="h">{{ h }}</option></select>
+            </div>
+            <div class="form-group"><label>Weight</label><input type="text" [(ngModel)]="profile.weight" class="form-control" /></div>
+            <div class="form-group"><label>Marital Status</label>
+              <select [(ngModel)]="profile.maritalStatus" class="form-control"><option *ngFor="let m of maritalStatuses" [value]="m">{{ m }}</option></select>
+            </div>
+            <div class="form-group"><label>Physical Status</label><input type="text" [(ngModel)]="profile.physicalStatus" class="form-control" /></div>
+            <div class="form-group"><label>Profile Managed By</label><input type="text" [(ngModel)]="profile.profileManagedBy" class="form-control" /></div>
+          </div>
+        </section>
+
+        <!-- 2. ABOUT ME SECTION -->
+        <section class="section-card" id="about" *ngIf="activeTab === 'all' || activeTab === 'about'">
+          <div class="card-header">
+            <h3><i class="bi bi-chat-square-quote-fill text-primary"></i> 2. About Me & Partner Expectations</h3>
+            <button class="btn-edit" *ngIf="!isPreviewMode" (click)="editState['about'] ? saveSection('about') : toggleEdit('about')">
+              <i class="bi" [ngClass]="editState['about'] ? 'bi-check-lg' : 'bi-pencil'"></i>
+              {{ editState['about'] ? 'Save Changes' : 'Edit' }}
+            </button>
+          </div>
+
+          <div class="bio-container" *ngIf="!editState['about']">
+            <div class="bio-block">
+              <h4>About Myself</h4>
+              <p>{{ profile.aboutMe || 'No details provided yet.' }}</p>
+            </div>
+            <div class="bio-block">
+              <h4>What I Am Looking For In A Partner</h4>
+              <p>{{ profile.partnerExpectations || 'No partner expectations specified yet.' }}</p>
+            </div>
+          </div>
+
+          <div class="edit-grid full-width" *ngIf="editState['about']">
+            <div class="form-group full-width">
+              <label>About Myself</label>
+              <textarea [(ngModel)]="profile.aboutMe" rows="4" class="form-control"></textarea>
+            </div>
+            <div class="form-group full-width">
+              <label>What I Am Looking For In A Partner</label>
+              <textarea [(ngModel)]="profile.partnerExpectations" rows="3" class="form-control"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. EDUCATION SECTION -->
+        <section class="section-card" id="education" *ngIf="activeTab === 'all' || activeTab === 'education'">
+          <div class="card-header">
+            <h3><i class="bi bi-mortarboard-fill text-primary"></i> 3. Education</h3>
+            <button class="btn-edit" *ngIf="!isPreviewMode" (click)="editState['education'] ? saveSection('education') : toggleEdit('education')">
+              <i class="bi" [ngClass]="editState['education'] ? 'bi-check-lg' : 'bi-pencil'"></i>
+              {{ editState['education'] ? 'Save Changes' : 'Edit' }}
+            </button>
+          </div>
+
+          <div class="info-grid" *ngIf="!editState['education']">
+            <div class="info-cell"><span class="k">Highest Education Degree</span><span class="v">{{ profile.highestEducation }}</span></div>
+            <div class="info-cell"><span class="k">College / University</span><span class="v">{{ profile.collegeOrUniversity }}</span></div>
+            <div class="info-cell full-width"><span class="k">Field of Study</span><span class="v">{{ profile.fieldOfStudy }}</span></div>
+          </div>
+
+          <div class="edit-grid" *ngIf="editState['education']">
+            <div class="form-group"><label>Highest Degree</label><input type="text" [(ngModel)]="profile.highestEducation" class="form-control" /></div>
+            <div class="form-group"><label>College / University</label><input type="text" [(ngModel)]="profile.collegeOrUniversity" class="form-control" /></div>
+            <div class="form-group full-width"><label>Field of Study</label><input type="text" [(ngModel)]="profile.fieldOfStudy" class="form-control" /></div>
+          </div>
+        </section>
+
+        <!-- 4. PROFESSION SECTION -->
+        <section class="section-card" id="profession" *ngIf="activeTab === 'all' || activeTab === 'profession'">
+          <div class="card-header">
+            <h3><i class="bi bi-briefcase-fill text-primary"></i> 4. Profession & Career</h3>
+            <button class="btn-edit" *ngIf="!isPreviewMode" (click)="editState['profession'] ? saveSection('profession') : toggleEdit('profession')">
+              <i class="bi" [ngClass]="editState['profession'] ? 'bi-check-lg' : 'bi-pencil'"></i>
+              {{ editState['profession'] ? 'Save Changes' : 'Edit' }}
+            </button>
+          </div>
+
+          <div class="info-grid" *ngIf="!editState['profession']">
+            <div class="info-cell"><span class="k">Employed In</span><span class="v">{{ profile.employedIn }}</span></div>
+            <div class="info-cell"><span class="k">Job Title / Occupation</span><span class="v">{{ profile.occupation }}</span></div>
+            <div class="info-cell"><span class="k">Company Name</span><span class="v">{{ profile.companyName }}</span></div>
+            <div class="info-cell"><span class="k">Work City</span><span class="v">{{ profile.workLocation }}</span></div>
+          </div>
+
+          <div class="edit-grid" *ngIf="editState['profession']">
+            <div class="form-group"><label>Employed In</label>
+              <select [(ngModel)]="profile.employedIn" class="form-control">
+                <option value="Private Sector">Private Sector</option>
+                <option value="Government / PSU">Government / PSU</option>
+                <option value="Business / Entrepreneur">Business / Entrepreneur</option>
+                <option value="Self Employed / Freelancer">Self Employed / Freelancer</option>
+                <option value="Not Working">Not Working</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Job Title</label><input type="text" [(ngModel)]="profile.occupation" class="form-control" /></div>
+            <div class="form-group"><label>Company Name</label><input type="text" [(ngModel)]="profile.companyName" class="form-control" /></div>
+            <div class="form-group"><label>Work City</label><input type="text" [(ngModel)]="profile.workLocation" class="form-control" /></div>
+          </div>
+        </section>
+
+        <!-- 5. INCOME SECTION -->
+        <section class="section-card" id="income" *ngIf="activeTab === 'all' || activeTab === 'income'">
+          <div class="card-header">
+            <h3><i class="bi bi-currency-rupee text-primary"></i> 5. Income</h3>
+            <button class="btn-edit" *ngIf="!isPreviewMode" (click)="editState['income'] ? saveSection('income') : toggleEdit('income')">
+              <i class="bi" [ngClass]="editState['income'] ? 'bi-check-lg' : 'bi-pencil'"></i>
+              {{ editState['income'] ? 'Save Changes' : 'Edit' }}
+            </button>
+          </div>
+
+          <div class="info-grid" *ngIf="!editState['income']">
+            <div class="info-cell full-width">
+              <span class="k">Annual Income</span>
+              <span class="v text-income"><i class="bi bi-cash-coin text-gold"></i> {{ profile.annualIncome }}</span>
+            </div>
+          </div>
+
+          <div class="edit-grid" *ngIf="editState['income']">
+            <div class="form-group full-width"><label>Annual Income</label>
+              <select [(ngModel)]="profile.annualIncome" class="form-control">
+                <option *ngFor="let inc of incomeOptions" [value]="inc">{{ inc }}</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. FAMILY DETAILS SECTION -->
+        <section class="section-card" id="family" *ngIf="activeTab === 'all' || activeTab === 'family'">
+          <div class="card-header">
+            <h3><i class="bi bi-people-fill text-primary"></i> 6. Family Details</h3>
+            <button class="btn-edit" *ngIf="!isPreviewMode" (click)="editState['family'] ? saveSection('family') : toggleEdit('family')">
+              <i class="bi" [ngClass]="editState['family'] ? 'bi-check-lg' : 'bi-pencil'"></i>
+              {{ editState['family'] ? 'Save Changes' : 'Edit' }}
+            </button>
+          </div>
+
+          <div class="info-grid" *ngIf="!editState['family']">
+            <div class="info-cell"><span class="k">Family Type</span><span class="v">{{ profile.familyType }}</span></div>
+            <div class="info-cell"><span class="k">Family Values</span><span class="v">{{ profile.familyValues }}</span></div>
+            <div class="info-cell"><span class="k">Father's Occupation</span><span class="v">{{ profile.fatherOccupation }}</span></div>
+            <div class="info-cell"><span class="k">Mother's Occupation</span><span class="v">{{ profile.motherOccupation }}</span></div>
+            <div class="info-cell"><span class="k">Brothers</span><span class="v">{{ profile.numberOfBrothers }}</span></div>
+            <div class="info-cell"><span class="k">Sisters</span><span class="v">{{ profile.numberOfSisters }}</span></div>
+            <div class="info-cell full-width"><span class="k">Family Location / City</span><span class="v">{{ profile.familyCity }}</span></div>
+          </div>
+
+          <div class="edit-grid" *ngIf="editState['family']">
+            <div class="form-group"><label>Family Type</label>
+              <select [(ngModel)]="profile.familyType" class="form-control">
+                <option value="Nuclear Family">Nuclear Family</option>
+                <option value="Joint Family">Joint Family</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Family Values</label>
+              <select [(ngModel)]="profile.familyValues" class="form-control">
+                <option value="Traditional">Traditional</option>
+                <option value="Moderate / Cultured">Moderate / Cultured</option>
+                <option value="Liberal">Liberal</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Father's Occupation</label><input type="text" [(ngModel)]="profile.fatherOccupation" class="form-control" /></div>
+            <div class="form-group"><label>Mother's Occupation</label><input type="text" [(ngModel)]="profile.motherOccupation" class="form-control" /></div>
+            <div class="form-group"><label>No. of Brothers</label><input type="number" [(ngModel)]="profile.numberOfBrothers" class="form-control" /></div>
+            <div class="form-group"><label>No. of Sisters</label><input type="number" [(ngModel)]="profile.numberOfSisters" class="form-control" /></div>
+            <div class="form-group full-width"><label>Family City</label><input type="text" [(ngModel)]="profile.familyCity" class="form-control" /></div>
+          </div>
+        </section>
+
+        <!-- 7. LIFESTYLE SECTION -->
+        <section class="section-card" id="lifestyle" *ngIf="activeTab === 'all' || activeTab === 'lifestyle'">
+          <div class="card-header">
+            <h3><i class="bi bi-cup-hot-fill text-primary"></i> 7. Lifestyle & Habits</h3>
+            <button class="btn-edit" *ngIf="!isPreviewMode" (click)="editState['lifestyle'] ? saveSection('lifestyle') : toggleEdit('lifestyle')">
+              <i class="bi" [ngClass]="editState['lifestyle'] ? 'bi-check-lg' : 'bi-pencil'"></i>
+              {{ editState['lifestyle'] ? 'Save Changes' : 'Edit' }}
+            </button>
+          </div>
+
+          <div class="info-grid" *ngIf="!editState['lifestyle']">
+            <div class="info-cell"><span class="k">Diet</span><span class="v badge-lifestyle"><i class="bi bi-egg-fried"></i> {{ profile.diet }}</span></div>
+            <div class="info-cell"><span class="k">Drinking</span><span class="v badge-lifestyle">{{ profile.drink }}</span></div>
+            <div class="info-cell"><span class="k">Smoking</span><span class="v badge-lifestyle">{{ profile.smoke }}</span></div>
+          </div>
+
+          <div class="edit-grid" *ngIf="editState['lifestyle']">
+            <div class="form-group"><label>Diet</label>
+              <select [(ngModel)]="profile.diet" class="form-control"><option *ngFor="let d of dietOptions" [value]="d">{{ d }}</option></select>
+            </div>
+            <div class="form-group"><label>Drinking</label>
+              <select [(ngModel)]="profile.drink" class="form-control">
+                <option value="No">No</option>
+                <option value="Socially">Socially</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Smoking</label>
+              <select [(ngModel)]="profile.smoke" class="form-control">
+                <option value="No">No</option>
+                <option value="Socially">Socially</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. HOBBIES SECTION -->
+        <section class="section-card" id="hobbies" *ngIf="activeTab === 'all' || activeTab === 'hobbies'">
+          <div class="card-header">
+            <h3><i class="bi bi-controller text-primary"></i> 8. Hobbies & Interests</h3>
+            <button class="btn-edit" *ngIf="!isPreviewMode" (click)="editState['hobbies'] ? saveSection('hobbies') : toggleEdit('hobbies')">
+              <i class="bi" [ngClass]="editState['hobbies'] ? 'bi-check-lg' : 'bi-pencil'"></i>
+              {{ editState['hobbies'] ? 'Save Changes' : 'Edit' }}
+            </button>
+          </div>
+
+          <div class="hobbies-display" *ngIf="!editState['hobbies']">
+            <p>{{ profile.hobbies }}</p>
+          </div>
+
+          <div class="edit-grid full-width" *ngIf="editState['hobbies']">
+            <div class="form-group full-width">
+              <label>Hobbies, Passions & Leisure Activities</label>
+              <textarea [(ngModel)]="profile.hobbies" rows="2" class="form-control"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- 9. RELIGION & ASTRO SECTION -->
+        <section class="section-card" id="religion" *ngIf="activeTab === 'all' || activeTab === 'religion'">
+          <div class="card-header">
+            <h3><i class="bi bi-brightness-high-fill text-primary"></i> 9. Religion, Caste & Horoscope</h3>
+            <button class="btn-edit" *ngIf="!isPreviewMode" (click)="editState['religion'] ? saveSection('religion') : toggleEdit('religion')">
+              <i class="bi" [ngClass]="editState['religion'] ? 'bi-check-lg' : 'bi-pencil'"></i>
+              {{ editState['religion'] ? 'Save Changes' : 'Edit' }}
+            </button>
+          </div>
+
+          <div class="info-grid" *ngIf="!editState['religion']">
+            <div class="info-cell"><span class="k">Religion</span><span class="v">{{ profile.religion }}</span></div>
+            <div class="info-cell"><span class="k">Caste</span><span class="v">{{ profile.caste || 'Caste No Bar' }}</span></div>
+            <div class="info-cell"><span class="k">Sub-caste / Gothra</span><span class="v">{{ profile.subCasteOrGothra || 'Not Specified' }}</span></div>
+            <div class="info-cell"><span class="k">Mother Tongue</span><span class="v">{{ profile.motherTongue }}</span></div>
+            <div class="info-cell"><span class="k">Manglik Status</span><span class="v">{{ profile.manglikStatus }}</span></div>
+            <div class="info-cell"><span class="k">Rashi / Nakshatra</span><span class="v">{{ profile.rashi }} / {{ profile.nakshatra }}</span></div>
+          </div>
+
+          <div class="edit-grid" *ngIf="editState['religion']">
+            <div class="form-group"><label>Religion</label><input type="text" [(ngModel)]="profile.religion" class="form-control" /></div>
+            <div class="form-group"><label>Caste</label><input type="text" [(ngModel)]="profile.caste" class="form-control" /></div>
+            <div class="form-group"><label>Sub-caste / Gothra</label><input type="text" [(ngModel)]="profile.subCasteOrGothra" class="form-control" /></div>
+            <div class="form-group"><label>Mother Tongue</label><input type="text" [(ngModel)]="profile.motherTongue" class="form-control" /></div>
+            <div class="form-group"><label>Manglik Status</label>
+              <select [(ngModel)]="profile.manglikStatus" class="form-control">
+                <option value="Non-Manglik">Non-Manglik</option>
+                <option value="Manglik">Manglik</option>
+                <option value="Anshik Manglik">Anshik Manglik</option>
+                <option value="Don't Know">Don't Know</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Rashi</label><input type="text" [(ngModel)]="profile.rashi" class="form-control" /></div>
+          </div>
+        </section>
+
+        <!-- 10. LOCATION SECTION -->
+        <section class="section-card" id="location" *ngIf="activeTab === 'all' || activeTab === 'location'">
+          <div class="card-header">
+            <h3><i class="bi bi-geo-alt-fill text-primary"></i> 10. Location Details</h3>
+            <button class="btn-edit" *ngIf="!isPreviewMode" (click)="editState['location'] ? saveSection('location') : toggleEdit('location')">
+              <i class="bi" [ngClass]="editState['location'] ? 'bi-check-lg' : 'bi-pencil'"></i>
+              {{ editState['location'] ? 'Save Changes' : 'Edit' }}
+            </button>
+          </div>
+
+          <div class="info-grid" *ngIf="!editState['location']">
+            <div class="info-cell"><span class="k">Current City</span><span class="v">{{ profile.city }}</span></div>
+            <div class="info-cell"><span class="k">State</span><span class="v">{{ profile.state }}</span></div>
+            <div class="info-cell"><span class="k">Country</span><span class="v">{{ profile.country }}</span></div>
+            <div class="info-cell"><span class="k">Native Place / Hometown</span><span class="v">{{ profile.nativePlace }}</span></div>
+            <div class="info-cell full-width"><span class="k">Willing to Relocate?</span><span class="v">{{ profile.willingToRelocate ? 'Yes' : 'No' }}</span></div>
+          </div>
+
+          <div class="edit-grid" *ngIf="editState['location']">
+            <div class="form-group"><label>Current City</label><input type="text" [(ngModel)]="profile.city" class="form-control" /></div>
+            <div class="form-group"><label>State</label><input type="text" [(ngModel)]="profile.state" class="form-control" /></div>
+            <div class="form-group"><label>Country</label><input type="text" [(ngModel)]="profile.country" class="form-control" /></div>
+            <div class="form-group"><label>Native Place</label><input type="text" [(ngModel)]="profile.nativePlace" class="form-control" /></div>
+          </div>
+        </section>
+
+        <!-- 11. PHOTOS SECTION -->
+        <section class="section-card" id="photos" *ngIf="activeTab === 'all' || activeTab === 'photos'">
+          <div class="card-header">
+            <h3><i class="bi bi-images text-primary"></i> 11. Photo Gallery ({{ profile.photoGallery.length }} / 6)</h3>
+          </div>
+
+          <p class="section-hint">Upload high quality authentic photos. You can set any picture as your primary avatar.</p>
+
+          <!-- Photo Grid -->
+          <div class="photo-gallery-grid">
+            <div class="photo-item" *ngFor="let photo of profile.photoGallery">
+              <img [src]="photo" alt="Photo" class="gallery-img" />
+              <span class="primary-badge" *ngIf="profile.profilePhotoUrl === photo">
+                <i class="bi bi-star-fill text-gold"></i> Primary
+              </span>
+              <div class="photo-overlay-actions" *ngIf="!isPreviewMode">
+                <button class="btn-icon" (click)="setPrimaryPhoto(photo)" title="Set as Primary">
+                  <i class="bi bi-star"></i>
+                </button>
+                <button class="btn-icon text-danger" (click)="removePhoto(photo)" title="Delete Photo">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Add Photo URL Form (if not preview mode) -->
+          <div class="add-photo-box" *ngIf="!isPreviewMode && (!profile.photoGallery || profile.photoGallery.length < 6)">
+            <label class="form-label"><i class="bi bi-plus-circle-fill text-primary"></i> Add Photo Image URL</label>
+            <div class="add-photo-input-wrap">
+              <input
+                type="text"
+                [(ngModel)]="newPhotoUrl"
+                placeholder="Paste direct image URL (e.g. https://images.unsplash.com/...)"
+                class="form-control"
+              />
+              <button class="btn btn-primary" (click)="addPhoto(newPhotoUrl)">
+                <i class="bi bi-cloud-arrow-up-fill"></i> Add Photo
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- TOAST POPUP -->
+  <div class="toast-popup" *ngIf="toastMessage">
+    <i class="bi bi-bell-fill"></i>
+    <span>{{ toastMessage }}</span>
+  </div>
+</div>

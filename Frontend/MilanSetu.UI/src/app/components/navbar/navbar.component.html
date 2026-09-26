@@ -32,7 +32,7 @@
         <li><a routerLink="/" fragment="search"><i class="bi bi-search-heart"></i> Search</a></li>
         <li><a routerLink="/" fragment="featured"><i class="bi bi-stars"></i> Featured Profiles</a></li>
         <li><a routerLink="/" fragment="stories"><i class="bi bi-chat-heart"></i> Success Stories</a></li>
-        <li><a routerLink="/register"><i class="bi bi-person-plus"></i> New Profile</a></li>
+        <li><a routerLink="/my-profile"><i class="bi bi-person-circle text-primary"></i> My Profile</a></li>
       </ul>
 
       <!-- Auth Action Buttons (Dynamic based on login status) -->
@@ -47,10 +47,10 @@
 
       <ng-template #loggedInTpl>
         <div class="nav-actions" *ngIf="authService.currentUser$ | async as user">
-          <div class="user-profile-badge">
+          <a routerLink="/my-profile" class="user-profile-badge" title="View & Edit My Profile">
             <i class="bi bi-person-circle text-primary"></i>
             <span class="user-nav-name">{{ user.name }}</span>
-          </div>
+          </a>
           <button (click)="logout()" class="btn btn-outline btn-sm">
             <i class="bi bi-box-arrow-right"></i> Logout
           </button>
